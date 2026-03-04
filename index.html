@@ -7,8 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <style>
-.tab-frame { display:none; flex:1; border:none; width:100%; min-height:0; background:transparent; }
-.tab-frame.on { display:block; }
+.tab-frame { display:none; flex:1; border:none; width:100%; height:calc(100vh - 110px); background:transparent; }
+.tab-frame.on { display:flex; flex-direction:column; }
 .app-body { flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative; }
 </style>
 </head>
@@ -67,15 +67,15 @@
     <button class="tab" data-tab="settings"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Sozlamalar</button>
   </div>
   <div class="app-body">
-    <iframe id="frame-home"      class="tab-frame" title="home"      sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
-    <iframe id="frame-book"      class="tab-frame" title="book"      sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
-    <iframe id="frame-vocab"     class="tab-frame" title="vocab"     sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
-    <iframe id="frame-spelling"  class="tab-frame" title="spelling"  sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
-    <iframe id="frame-mcq"       class="tab-frame" title="mcq"       sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
-    <iframe id="frame-filltype"  class="tab-frame" title="filltype"  sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
-    <iframe id="frame-wordorder" class="tab-frame" title="wordorder" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
-    <iframe id="frame-free"      class="tab-frame" title="free"      sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
-    <iframe id="frame-settings"  class="tab-frame" title="settings"  sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    <iframe id="frame-home"      class="tab-frame" title="home"      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="microphone"></iframe>
+    <iframe id="frame-book"      class="tab-frame" title="book"      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="microphone"></iframe>
+    <iframe id="frame-vocab"     class="tab-frame" title="vocab"     sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="microphone"></iframe>
+    <iframe id="frame-spelling"  class="tab-frame" title="spelling"  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="microphone"></iframe>
+    <iframe id="frame-mcq"       class="tab-frame" title="mcq"       sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="microphone"></iframe>
+    <iframe id="frame-filltype"  class="tab-frame" title="filltype"  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="microphone"></iframe>
+    <iframe id="frame-wordorder" class="tab-frame" title="wordorder" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="microphone"></iframe>
+    <iframe id="frame-free"      class="tab-frame" title="free"      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="microphone"></iframe>
+    <iframe id="frame-settings"  class="tab-frame" title="settings"  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="microphone"></iframe>
   </div>
   <div class="status-bar">
     <div class="sdot"></div>
