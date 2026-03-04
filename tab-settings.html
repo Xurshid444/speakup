@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SpeakUp — Sozlamalar</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body style="margin:0;display:flex;flex-direction:column;min-height:100vh;">
+<div class="app-body" style="flex:1;display:flex;flex-direction:column;max-width:860px;width:100%;margin:0 auto;padding:20px 24px;">
+<div id="settings-panel" class="panel">
+      <div class="scard">
+        <h4>🎨 Ko'rinish</h4>
+        <div class="seg" id="theme-seg"><button class="on" data-v="dark">🌙 Dark</button><button data-v="light">☀️ Light</button></div>
+        <label class="lbl mt">Shirift kattaligi</label>
+        <div class="seg" id="font-seg">
+          <button data-v="14">A <span style="font-size:10px">kichik</span></button>
+          <button class="on" data-v="16">A <span style="font-size:10px">o'rta</span></button>
+          <button data-v="18">A <span style="font-size:10px">katta</span></button>
+          <button data-v="20">A <span style="font-size:10px">juda katta</span></button>
+        </div>
+      </div>
+      <div class="scard">
+        <h4>📚 O'qish sozlamalari</h4>
+        <label class="lbl">Daraja</label>
+        <select class="sel" id="lvl-app"><option value="A1" selected>A1 — Boshlang'ich</option><option value="A2">A2 — O'rta past</option><option value="B1">B1 — O'rta</option></select>
+        <label class="lbl mt">Tuzatish tili</label>
+        <div class="seg" id="lang-app"><button class="on" data-v="uz">🇺🇿 O'zbekcha</button><button data-v="en">🇺🇸 Inglizcha</button></div>
+        <label class="lbl mt">Aksent</label>
+        <div class="seg" id="acc-app"><button data-v="en-US">🇺🇸 American</button><button class="on" data-v="en-GB">🇬🇧 British</button></div>
+      </div>
+      <div class="scard">
+        <h4>⏱ Ovoz tezligi — <span id="spd-disp">1.0x</span></h4>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:6px;">
+          <span style="font-size:11px;color:var(--text3)">Sekin</span><input type="range" id="spd-app" min="0.5" max="2" step="0.1" value="1" style="flex:1;"><span style="font-size:11px;color:var(--text3)">Tez</span>
+        </div>
+      </div>
+      <div class="scard">
+        <h4>🎙 ElevenLabs TTS <span class="optional-badge">IXTIYORIY</span></h4>
+        <label class="lbl">API Key</label>
+        <div style="display:flex;gap:8px;margin-bottom:10px;"><input class="inp" type="password" id="el-app" placeholder="sk_..." style="flex:1;"/><button class="btn btn-s btn-sm" id="save-el-btn">💾</button></div>
+        <label class="lbl">Ovoz</label>
+        <div style="display:flex;gap:8px;margin-bottom:10px;"><select class="sel" id="el-voice-sel" style="flex:1;"><option value="">— Avval key kiriting —</option></select><button class="btn btn-s btn-sm" id="el-load-btn" title="Ovozlarni yuklash">🔄</button></div>
+        <button class="btn btn-s btn-sm" id="test-el-btn" style="width:100%;margin-bottom:8px;">▶ Sinash</button>
+        <div id="el-limit-wrap" style="display:none;margin-top:6px;"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px;"><span>Oylik limit</span><span id="el-limit-txt"></span></div><div style="height:5px;background:var(--s2);border-radius:3px;overflow:hidden;"><div id="el-limit-fill" style="height:100%;border-radius:3px;transition:width .4s;"></div></div></div>
+        <p id="el-status" style="margin-top:8px;font-size:12px;color:var(--text3);">Key kiritilmagan — brauzer TTS ishlatilmoqda.</p>
+      </div>
+      <div class="scard">
+        <h4>🔊 Brauzer ovozi <span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;">(zaxira)</span></h4>
+        <select class="sel" id="voice-picker"></select><button class="btn btn-s btn-sm" id="test-br-btn" style="width:100%;margin-top:8px;">▶ Sinash</button>
+      </div>
+      <div class="scard">
+        <h4>🔑 Groq API Key</h4>
+        <div style="display:flex;gap:8px;"><input class="inp" type="password" id="api-app" placeholder="gsk_..." style="flex:1;"/><button class="btn btn-s btn-sm" id="save-api-btn">💾</button></div>
+        <div class="usage-grid" id="groq-usage-wrap">
+          <div class="usage-box">
+            <div class="ub-lbl">Bugungi tokenlar</div>
+            <div class="ub-val" id="groq-day-val">0</div>
+            <div class="ub-sub">/ <span id="groq-day-limit-lbl">0</span> limit</div>
+            <div class="usage-bar-wrap"><div class="usage-bar" id="groq-day-bar" style="width:0%;background:var(--accent);"></div></div>
+          </div>
+          <div class="usage-box">
+            <div class="ub-lbl">Oylik tokenlar</div>
+            <div class="ub-val" id="groq-mon-val">0</div>
+            <div class="ub-sub">/ <span id="groq-mon-limit-lbl">0</span> limit</div>
+            <div class="usage-bar-wrap"><div class="usage-bar" id="groq-mon-bar" style="width:0%;background:var(--blue);"></div></div>
+          </div>
+        </div>
+        <div class="groq-limit-cfg">
+          <label>Kunlik limit:</label>
+          <input class="inp" type="number" id="groq-day-limit-inp" placeholder="14400" min="1000" style="width:90px;padding:6px 10px;font-size:12px;">
+          <label>Oylik limit:</label>
+          <input class="inp" type="number" id="groq-mon-limit-inp" placeholder="500000" min="10000" style="width:90px;padding:6px 10px;font-size:12px;">
+          <button class="btn btn-s btn-sm" id="groq-limit-save-btn">💾</button>
+        </div>
+        <div class="usage-reset" id="groq-rate-info">So'nggi so'rov: —</div>
+      </div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+
+const $ = id => document.getElementById(id);
+const toast = (m, d=3000) => {
+  const t = $('toast');
+  if (t) { t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), d); }
+};
+const scrollB = id => { const e = $(id); if(e) e.scrollTop = e.scrollHeight; };
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const setSt = m => window.parent.postMessage({type:'set_status', msg:m}, '*');
+
+function getState() {
+  try { return JSON.parse(localStorage.getItem('su_state') || '{}'); } catch(e) { return {}; }
+}
+function sendState(patch) {
+  const s = getState(); Object.assign(s, patch);
+  localStorage.setItem('su_state', JSON.stringify(s));
+  window.parent.postMessage({type:'state_update', payload:s}, '*');
+}
+function switchTab(name) {
+  window.parent.postMessage({type:'switch_tab', tab:name}, '*');
+}
+async function waitForKey() {
+  return new Promise(resolve => {
+    const s = getState();
+    if (s.groqKey) { resolve(true); return; }
+    window.parent.postMessage({type:'need_key'}, '*');
+    const h = e => {
+      if (e.data && e.data.type === 'set_key') {
+        window.removeEventListener('message', h); resolve(true);
+      }
+    };
+    window.addEventListener('message', h);
+  });
+}
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'set_key') {
+    const s = getState(); s.groqKey = e.data.key;
+    localStorage.setItem('su_state', JSON.stringify(s));
+  }
+});
+
+
+// Settings o'zgarishlarini parent ga yuborish
+function saveToParent(patch) {
+  sendState(patch);
+  toast('✅ Saqlandi');
+}
+
+// Theme
+document.querySelectorAll('#theme-seg button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#theme-seg button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    const t = btn.dataset.v;
+    document.body.classList.toggle('light', t==='light');
+    localStorage.setItem('theme', t);
+    window.parent.postMessage({type:'theme', value:t}, '*');
+  });
+});
+
+// Font size
+function applyFontSize(sz) { document.body.style.fontSize = sz+'px'; }
+document.querySelectorAll('#font-seg button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#font-seg button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    const sz = parseInt(btn.dataset.v);
+    applyFontSize(sz); localStorage.setItem('font_size', sz);
+    window.parent.postMessage({type:'font_size', value:sz}, '*');
+  });
+});
+
+// Level
+$('lvl-app').addEventListener('change', e => saveToParent({level: e.target.value}));
+
+// Tuzatish tili
+document.querySelectorAll('#lang-app button').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('#lang-app button').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); saveToParent({feedbackLang: btn.dataset.v});
+}));
+
+// Aksent
+document.querySelectorAll('#acc-app button').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('#acc-app button').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); saveToParent({accent: btn.dataset.v});
+}));
+
+// ElevenLabs key
+$('el-save-btn').addEventListener('click', () => {
+  const k = $('el-key-inp').value.trim();
+  saveToParent({elKey: k});
+  $('tts-indicator-s').textContent = k ? '🎙 ElevenLabs TTS' : '🔊 Brauzer TTS';
+});
+
+// Groq key — settings dagi maydon
+const apiApp = $('api-app');
+if (apiApp) {
+  apiApp.addEventListener('change', e => saveToParent({groqKey: e.target.value.trim()}));
+}
+
+// Groq usage limits
+$('groq-limit-save-btn')?.addEventListener('click', () => {
+  const d = parseInt($('groq-day-limit-inp').value) || 14400;
+  const m = parseInt($('groq-mon-limit-inp').value) || 500000;
+  localStorage.setItem('groq_day_limit', d); localStorage.setItem('groq_mon_limit', m);
+  renderGroqUsage(); toast('✅ Saqlandi');
+});
+
+// Groq usage render
+function groqUsageKey(type){ const d=new Date(); return type==='day'?`groq_day_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`:`groq_mon_${d.getFullYear()}_${d.getMonth()}`; }
+function renderGroqUsage(){
+  const dk=groqUsageKey('day'), mk=groqUsageKey('mon');
+  const dayUsed=parseInt(localStorage.getItem(dk)||'0');
+  const monUsed=parseInt(localStorage.getItem(mk)||'0');
+  const dayLim=parseInt(localStorage.getItem('groq_day_limit')||'14400');
+  const monLim=parseInt(localStorage.getItem('groq_mon_limit')||'500000');
+  const dayPct=Math.min(100,Math.round(dayUsed/dayLim*100));
+  const monPct=Math.min(100,Math.round(monUsed/monLim*100));
+  const g = id => document.getElementById(id); if(!g('groq-day-val')) return;
+  g('groq-day-val').textContent=dayUsed.toLocaleString();
+  g('groq-day-limit-lbl').textContent=dayLim.toLocaleString();
+  g('groq-mon-val').textContent=monUsed.toLocaleString();
+  g('groq-mon-limit-lbl').textContent=monLim.toLocaleString();
+  g('groq-day-limit-inp').value=dayLim; g('groq-mon-limit-inp').value=monLim;
+  const db=g('groq-day-bar'); if(db){db.style.width=dayPct+'%';db.style.background=dayPct>90?'var(--red)':dayPct>70?'var(--gold)':'var(--accent)';}
+  const mb=g('groq-mon-bar'); if(mb){mb.style.width=monPct+'%';mb.style.background=monPct>90?'var(--red)':monPct>70?'var(--gold)':'var(--blue)';}
+}
+
+// Sahifa yuklanganda saved state ni ko'rsatish
+(function() {
+  const s = getState();
+  if (s.level && $('lvl-app')) $('lvl-app').value = s.level;
+  if (s.accent) {
+    document.querySelectorAll('#acc-app button').forEach(b => b.classList.toggle('on', b.dataset.v===s.accent));
+  }
+  if (s.feedbackLang) {
+    document.querySelectorAll('#lang-app button').forEach(b => b.classList.toggle('on', b.dataset.v===s.feedbackLang));
+  }
+  if (s.elKey && $('el-key-inp')) $('el-key-inp').value = s.elKey;
+  if (s.groqKey && $('api-app')) $('api-app').value = s.groqKey;
+  const t = localStorage.getItem('theme')||'dark';
+  if (t==='light') { document.body.classList.add('light'); document.querySelectorAll('#theme-seg button').forEach(b=>b.classList.toggle('on',b.dataset.v===t)); }
+  const fs = parseInt(localStorage.getItem('font_size')||'16');
+  applyFontSize(fs); document.querySelectorAll('#font-seg button').forEach(b=>b.classList.toggle('on',parseInt(b.dataset.v)===fs));
+  renderGroqUsage();
+})();
+
+</script>
+</body>
+</html>

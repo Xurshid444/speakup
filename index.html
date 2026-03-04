@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SpeakUp — Navigate A1</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.tab-frame { display:none; flex:1; border:none; width:100%; min-height:0; background:transparent; }
+.tab-frame.on { display:block; }
+.app-body { flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative; }
+</style>
+</head>
+<body>
+
+<div id="setup-screen" class="screen active">
+  <div class="sw">
+    <div class="logo">🎙 SpeakUp</div>
+    <div class="tagline">Navigate A1 bilan inglizcha gaplashni o'rgan</div>
+    <div class="card">
+      <h2>Xush kelibsiz! 👋</h2>
+      <p>AI ustoz bilan inglizcha gaplashing, so'zlarni o'rganing va mashq qiling. Boshlash uchun hech narsa talab qilinmaydi — faqat bir tugma!</p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin:16px 0 4px;">
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="font-size:20px;">📚</span> Navigate A1 darslari bilan o'rgan</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="font-size:20px;">🎤</span> AI ustoz bilan ovozli suhbat</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="font-size:20px;">✍️</span> Spelling, Vocabulary, Grammar mashqlari</div>
+      </div>
+      <button class="btn btn-g" id="start-btn" style="margin-top:18px;">▶ Boshlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- GROQ KEY MODAL -->
+<div id="key-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:9998;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:24px;padding:28px;max-width:440px;width:100%;">
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">🔑 Groq API Key kerak</div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:18px;">
+      AI bilan suhbat qilish uchun bepul Groq API key kiriting.<br>
+      Key olish: <a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent);">console.groq.com/keys</a> → "Create API Key"
+    </p>
+    <label class="lbl">Groq API Key</label>
+    <input class="inp" type="password" id="api-inp" placeholder="gsk_..." autocomplete="off" style="margin-bottom:14px;"/>
+    <button class="btn btn-g" id="key-modal-save" style="margin-top:0;">✓ Saqlash va davom etish</button>
+    <button onclick="closeKeyModal()" style="width:100%;margin-top:8px;padding:10px;background:transparent;border:none;color:var(--text3);font-size:13px;cursor:pointer;">Bekor qilish</button>
+  </div>
+</div>
+
+<div id="app-screen" class="screen" style="flex-direction:column;">
+<div id="app-screen" class="screen" style="flex-direction:column;">
+  <div class="app-bar">
+    <div class="app-logo" id="home-logo-btn" style="cursor:pointer;" title="Bosh sahifa">🎙 SpeakUp</div>
+    <div class="hright">
+      <div class="badge" id="lvl-badge">A1</div>
+      <div class="icon-btn" id="logout-btn">🚪</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab" data-tab="home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg> Bosh sahifa</button>
+    <button class="tab on" data-tab="book"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Navigate A1</button>
+    <button class="tab" data-tab="vocab"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg> Vocabulary</button>
+    <button class="tab" data-tab="spelling"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Spelling</button>
+    <button class="tab" data-tab="mcq"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Fill MCQ</button>
+    <button class="tab" data-tab="filltype"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8"/><path d="M8 14h4"/></svg> Fill Type</button>
+    <button class="tab" data-tab="wordorder"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="9" x2="15" y2="9"/><line x1="3" y1="15" x2="9" y2="15"/><path d="M17 12l4-3-4-3"/><path d="M21 15l-4 3 4 3" opacity=".5"/></svg> Word Order</button>
+    <button class="tab" data-tab="free"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Erkin suhbat</button>
+    <button class="tab" data-tab="settings"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Sozlamalar</button>
+  </div>
+  <div class="app-body">
+    <iframe id="frame-home"      class="tab-frame" title="home"      sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    <iframe id="frame-book"      class="tab-frame" title="book"      sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    <iframe id="frame-vocab"     class="tab-frame" title="vocab"     sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    <iframe id="frame-spelling"  class="tab-frame" title="spelling"  sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    <iframe id="frame-mcq"       class="tab-frame" title="mcq"       sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    <iframe id="frame-filltype"  class="tab-frame" title="filltype"  sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    <iframe id="frame-wordorder" class="tab-frame" title="wordorder" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    <iframe id="frame-free"      class="tab-frame" title="free"      sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    <iframe id="frame-settings"  class="tab-frame" title="settings"  sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+  </div>
+  <div class="status-bar">
+    <div class="sdot"></div>
+    <span id="status-txt">Tayyor</span>
+    <span style="margin-left:auto;color:var(--text3)" id="tts-indicator">🔊 Brauzer TTS</span>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="shared.js"></script>
+<script>
+const TABS = ['home','book','vocab','spelling','mcq','filltype','wordorder','free','settings'];
+const loaded = {};
+
+// ─── Tab switching ───
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  const btn = document.querySelector(`.tab[data-tab="${name}"]`);
+  if (btn) btn.classList.add('on');
+
+  document.querySelectorAll('.tab-frame').forEach(f => f.classList.remove('on'));
+  const frame = document.getElementById('frame-' + name);
+  if (!frame) return;
+  frame.classList.add('on');
+
+  // Lazy load
+  if (!loaded[name]) {
+    loaded[name] = true;
+    frame.src = 'tab-' + name + '.html';
+  }
+  // State ni sync qilamiz
+  syncStateToFrame(frame);
+}
+
+function syncStateToFrame(frame) {
+  try {
+    frame.contentWindow.postMessage({type:'sync_state', state: localStorage.getItem('su_state')}, '*');
+  } catch(e) {}
+}
+
+// ─── iframe xabarlari ───
+window.addEventListener('message', (e) => {
+  if (!e.data) return;
+
+  if (e.data.type === 'state_update') {
+    const s = e.data.payload;
+    Object.assign(S, s);
+    localStorage.setItem('su_state', JSON.stringify(s));
+    const badge = document.getElementById('lvl-badge');
+    if (badge) badge.textContent = S.level || 'A1';
+  }
+  if (e.data.type === 'set_status') {
+    const el = document.getElementById('status-txt');
+    if (el) el.textContent = e.data.msg;
+  }
+  if (e.data.type === 'toast') {
+    toast(e.data.msg);
+  }
+  if (e.data.type === 'switch_tab') {
+    switchTab(e.data.tab);
+  }
+  if (e.data.type === 'need_key') {
+    openKeyModal();
+  }
+  if (e.data.type === 'theme') {
+    document.body.classList.toggle('light', e.data.value === 'light');
+    localStorage.setItem('theme', e.data.value);
+  }
+  if (e.data.type === 'font_size') {
+    document.body.style.fontSize = e.data.value + 'px';
+    localStorage.setItem('font_size', e.data.value);
+  }
+});
+
+// ─── Key modal ───
+let _pendingKeyResolve = null;
+function openKeyModal() {
+  const m = document.getElementById('key-modal');
+  m.style.display = 'flex';
+  setTimeout(() => document.getElementById('api-inp').focus(), 100);
+}
+function closeKeyModal() {
+  document.getElementById('key-modal').style.display = 'none';
+}
+
+document.getElementById('api-inp').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('key-modal-save').click();
+});
+
+document.getElementById('key-modal-save').addEventListener('click', () => {
+  const k = document.getElementById('api-inp').value.trim();
+  if (!k) { toast('❌ Key kiriting!'); return; }
+  S.groqKey = k;
+  const saved = JSON.parse(localStorage.getItem('su_state') || '{}');
+  saved.groqKey = k;
+  localStorage.setItem('su_state', JSON.stringify(saved));
+  document.getElementById('key-modal').style.display = 'none';
+  toast('✅ Groq key saqlandi');
+  // Barcha yuklangan iframelarga key yuboramiz
+  TABS.forEach(name => {
+    const fr = document.getElementById('frame-' + name);
+    if (fr && fr.contentWindow && loaded[name]) {
+      fr.contentWindow.postMessage({type:'set_key', key:k}, '*');
+    }
+  });
+});
+
+// ─── Kirish tugmasi ───
+document.getElementById('start-btn').addEventListener('click', () => {
+  document.getElementById('setup-screen').classList.remove('active');
+  document.getElementById('app-screen').classList.add('active');
+  const badge = document.getElementById('lvl-badge');
+  if (badge) badge.textContent = S.level || 'A1';
+  switchTab('home');
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  if (confirm('Chiqasizmi?')) {
+    localStorage.removeItem('su_state');
+    location.reload();
+  }
+});
+
+document.getElementById('home-logo-btn').addEventListener('click', () => switchTab('home'));
+
+// ─── Sahifa yuklanganda ───
+(function() {
+  const saved = localStorage.getItem('su_state');
+  if (saved) { try { Object.assign(S, JSON.parse(saved)); } catch(e) {} }
+  const t = localStorage.getItem('theme') || 'dark';
+  if (t === 'light') document.body.classList.add('light');
+  const fs = parseInt(localStorage.getItem('font_size') || '16');
+  document.body.style.fontSize = fs + 'px';
+  const badge = document.getElementById('lvl-badge');
+  if (badge) badge.textContent = S.level || 'A1';
+})();
+</script>
+</body>
+</html>

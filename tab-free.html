@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SpeakUp — Erkin suhbat</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body style="margin:0;display:flex;flex-direction:column;min-height:100vh;">
+<div class="app-body" style="flex:1;display:flex;flex-direction:column;max-width:860px;width:100%;margin:0 auto;padding:20px 24px;">
+<div id="free-panel" class="panel">
+      <div class="chat-area" id="free-chat">
+        <div id="free-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;gap:8px;padding:40px;">
+          <div style="font-size:42px;">💬</div><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;">Erkin suhbat</div>
+          <div style="color:var(--text2);font-size:13px;max-width:280px;line-height:1.6;">Istalgan mavzuda inglizcha gaplashing. AI xatolaringizni tuzatib boradi.</div>
+          <button class="btn btn-g" id="free-start-btn" style="width:auto;margin-top:8px;padding:10px 22px;">Boshlash →</button>
+        </div>
+      </div>
+      <div class="mic-area">
+        <div class="mic-status" id="tb-free">Bosib gapiring...</div>
+        <div class="wave" id="wv-free"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="mic-ctrl">
+          <div id="fi" class="rrow"><button class="rec-btn" id="frec"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></button></div>
+          <div id="fr" class="rrow" style="display:none;"><button class="stop-btn" id="fstop"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></button><div class="rec-lbl"><span class="rdot"></span>Yozilmoqda</div></div>
+          <div id="fv" class="rev-row" style="display:none;"><button class="del-btn" id="fdel">✕ O'chirish</button><button class="snd-btn" id="fsnd">↑ Yuborish</button></div>
+        </div>
+      </div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+
+const $ = id => document.getElementById(id);
+const toast = (m, d=3000) => {
+  const t = $('toast');
+  if (t) { t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), d); }
+};
+const scrollB = id => { const e = $(id); if(e) e.scrollTop = e.scrollHeight; };
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const setSt = m => window.parent.postMessage({type:'set_status', msg:m}, '*');
+
+function getState() {
+  try { return JSON.parse(localStorage.getItem('su_state') || '{}'); } catch(e) { return {}; }
+}
+function sendState(patch) {
+  const s = getState(); Object.assign(s, patch);
+  localStorage.setItem('su_state', JSON.stringify(s));
+  window.parent.postMessage({type:'state_update', payload:s}, '*');
+}
+function switchTab(name) {
+  window.parent.postMessage({type:'switch_tab', tab:name}, '*');
+}
+async function waitForKey() {
+  return new Promise(resolve => {
+    const s = getState();
+    if (s.groqKey) { resolve(true); return; }
+    window.parent.postMessage({type:'need_key'}, '*');
+    const h = e => {
+      if (e.data && e.data.type === 'set_key') {
+        window.removeEventListener('message', h); resolve(true);
+      }
+    };
+    window.addEventListener('message', h);
+  });
+}
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'set_key') {
+    const s = getState(); s.groqKey = e.data.key;
+    localStorage.setItem('su_state', JSON.stringify(s));
+  }
+});
+
+let curAudio=null;
+async function speak(text,cb){
+  if(!text||!text.trim())return; if(curAudio){curAudio.pause();curAudio.src='';curAudio=null;} window.speechSynthesis.cancel();
+  if(S.elKey) {
+    try{
+      setSt('Ovoz tayyorlanmoqda...');
+      const r=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${S.elVoice}`,{
+        method:'POST', headers:{'xi-api-key':S.elKey,'Content-Type':'application/json','Accept':'audio/mpeg'},
+        body:JSON.stringify({text,model_id:'eleven_turbo_v2',voice_settings:{stability:0.5,similarity_boost:0.75,speed:S.speed}})
+      });
+      if(r.ok){
+        const blob=await r.blob();
+        if(blob.size>500){
+          const url=URL.createObjectURL(blob); curAudio=new Audio(url);
+          if(cb)curAudio.onended=cb; setSt('Tayyor'); await curAudio.play().catch(()=>{}); return;
+        }
+      } else {
+        const err=await r.json().catch(()=>({}));
+        if(err?.detail?.status==='quota_exceeded'){
+          toast('⚠️ ElevenLabs limiti tugadi — brauzer TTS ga o\'tildi'); $('el-status').textContent='⚠️ Oylik limit tugagan! Keyingi oyga qadar brauzer TTS ishlatilmoqda.'; $('el-limit-fill').style.width='100%'; $('el-limit-fill').style.background='#ff5a5a';
+        } else console.warn('EL error:',err?.detail);
+      }
+    }catch(e){ console.warn('EL failed:',e.message); }
+    setSt('Tayyor');
+  }
+  browserSpeak(text,cb);
+}
+
+function browserSpeak(text,cb){
+  const doIt=()=>{
+    const vv=window.speechSynthesis.getVoices(); const u=new SpeechSynthesisUtterance(text); u.lang=S.accent; u.rate=S.speed; u.pitch=1.05;
+    if(S.pickedVoice){ const v=vv.find(x=>x.name===S.pickedVoice.name); if(v)u.voice=v; }
+    if(cb)u.onend=cb; window.speechSynthesis.speak(u);
+  };
+  if(window.speechSynthesis.getVoices().length===0) window.speechSynthesis.addEventListener('voiceschanged',doIt,{once:true}); else doIt();
+}
+function getQ(text){ const lines=text.split('\n').filter(l=>l.trim()); for(let i=lines.length-1;i>=0;i--)if(lines[i].includes('?'))return lines[i]; return lines[lines.length-1]||text; }
+
+async function groq(sys,msgs){
+  if(!S.groqKey){
+    const ok=await waitForKey();
+    if(!ok) throw new Error('API key kiritilmadi');
+  }
+  setSt("AI o'ylayapti...");
+  const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST', headers:{'Authorization':`Bearer ${S.groqKey}`,'Content-Type':'application/json'},
+    body:JSON.stringify({model:S.model,messages:[{role:'system',content:sys},...msgs],temperature:0.82,max_tokens:600})
+  });
+  const d=await r.json(); if(d.error)throw new Error(d.error.message);
+  // Token usage tracking
+  if(d.usage){ trackGroqUsage(d.usage.total_tokens||0); }
+  // Rate limit info from headers
+  const rl={ remain:r.headers.get('x-ratelimit-remaining-tokens'), reset:r.headers.get('x-ratelimit-reset-tokens') };
+  if(rl.remain!==null){ const el=$('groq-rate-info'); if(el) el.textContent=`Rate limit: ${Number(rl.remain).toLocaleString()} token qoldi${rl.reset?' · reset: '+rl.reset:''}`; }
+  setSt('Tayyor'); return d.choices[0].message.content;
+}
+
+// ════════════════════════════
+// GROQ TOKEN TRACKER
+// ════════════════════════════
+function groqUsageKey(type){ const d=new Date(); return type==='day'?`groq_day_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`:`groq_mon_${d.getFullYear()}_${d.getMonth()}`; }
+function trackGroqUsage(tokens){
+  const dk=groqUsageKey('day'), mk=groqUsageKey('mon');
+  const dayUsed=(parseInt(localStorage.getItem(dk)||'0'))+tokens;
+  const monUsed=(parseInt(localStorage.getItem(mk)||'0'))+tokens;
+  localStorage.setItem(dk, dayUsed); localStorage.setItem(mk, monUsed);
+  renderGroqUsage();
+}
+function renderGroqUsage(){
+  const dk=groqUsageKey('day'), mk=groqUsageKey('mon');
+  const dayUsed=parseInt(localStorage.getItem(dk)||'0');
+  const monUsed=parseInt(localStorage.getItem(mk)||'0');
+  const dayLim=parseInt(localStorage.getItem('groq_day_limit')||'14400');
+  const monLim=parseInt(localStorage.getItem('groq_mon_limit')||'500000');
+  const dayPct=Math.min(100,Math.round(dayUsed/dayLim*100));
+  const monPct=Math.min(100,Math.round(monUsed/monLim*100));
+  const $g=id=>document.getElementById(id); if(!$g('groq-day-val'))return;
+  $g('groq-day-val').textContent=dayUsed.toLocaleString();
+  $g('groq-day-limit-lbl').textContent=dayLim.toLocaleString();
+  $g('groq-mon-val').textContent=monUsed.toLocaleString();
+  $g('groq-mon-limit-lbl').textContent=monLim.toLocaleString();
+  $g('groq-day-limit-inp').value=dayLim;
+  $g('groq-mon-limit-inp').value=monLim;
+  const hsEl=document.getElementById('hs-tokens');
+  if(hsEl) hsEl.textContent=dayUsed>999?(dayUsed/1000).toFixed(1)+'K':String(dayUsed||0);
+  const dayBar=$g('groq-day-bar'); if(dayBar){dayBar.style.width=dayPct+'%';
+  dayBar.style.background=dayPct>90?'var(--red)':dayPct>70?'var(--gold)':'var(--accent)';}
+  const monBar=$g('groq-mon-bar'); if(monBar){monBar.style.width=monPct+'%';
+  monBar.style.background=monPct>90?'var(--red)':monPct>70?'var(--gold)':'var(--blue)';}
+}
+// ════════════════════════════
+// MIKROFON VA MESSAGES YORDAMCHILARI
+// ════════════════════════════
+let sharedStream=null;
+async function reqMic(){ try{sharedStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(e){} }
+async function getStream(){
+  if(sharedStream&&sharedStream.active)return sharedStream;
+  sharedStream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,sampleRate:16000}}); return sharedStream;
+}
+function makeMic(cfg){
+  const idle=$(cfg.idle),recst=$(cfg.recst),rev=$(cfg.rev);
+  const recBtn=$(cfg.rec),stopBtn=$(cfg.stop),delBtn=$(cfg.del),sndBtn=$(cfg.snd);
+  const tbox=$(cfg.tbox),wave=$(cfg.wave); let mr=null,chunks=[],ablob=null;
+  const setStatus=(txt,on=false)=>{ if(!tbox)return; tbox.textContent=txt; tbox.classList.toggle('on',on); };
+  const showI=()=>{idle.style.display='flex';recst.style.display='none';rev.style.display='none';wave.classList.remove('show');setStatus('Bosib gapiring...',false);};
+  const showR=()=>{idle.style.display='none';recst.style.display='flex';rev.style.display='none';wave.classList.add('show');};
+  const showV=()=>{idle.style.display='none';recst.style.display='none';rev.style.display='flex';wave.classList.remove('show');};
+  async function startRec(){
+    window.speechSynthesis.cancel(); if(curAudio){curAudio.pause();curAudio=null;} chunks=[];ablob=null; setStatus('🔴 Yozilmoqda...',true);showR();
+    let stream; try{stream=await getStream();}catch(e){toast('❌ Mikrofon ruxsati berilmagan!');showI();return;}
+    const fmts=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4']; const fmt=fmts.find(f=>MediaRecorder.isTypeSupported(f))||'';
+    mr=new MediaRecorder(stream,fmt?{mimeType:fmt}:{}); mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+    mr.onstop=()=>{ ablob=new Blob(chunks,{type:mr.mimeType||'audio/webm'}); const url=URL.createObjectURL(ablob); setStatus('✅ Yozildi — eshiting yoki yuboring',true); showV(); };
+    mr.start(250);
+  }
+  recBtn.addEventListener('click',startRec); stopBtn.addEventListener('click',()=>{if(mr&&mr.state!=='inactive')mr.stop();});
+  delBtn.addEventListener('click',()=>{ablob=null;chunks=[];showI();});
+  sndBtn.addEventListener('click',async()=>{
+    if(!ablob){toast("Ovoz yo'q!");return;}
+    if(!S.groqKey){ const ok=await waitForKey(); if(!ok) return; }
+    const b=ablob;ablob=null;chunks=[]; setStatus('⏳ Tanilmoqda...',true);showI();
+    try{
+      const fd=new FormData(); const ext=b.type.includes('mp4')?'mp4':b.type.includes('ogg')?'ogg':'webm'; const file=new File([b],`a.${ext}`,{type:b.type});
+      fd.append('file',file); fd.append('model','whisper-large-v3-turbo'); fd.append('language','en'); fd.append('response_format','text');
+      const r=await fetch('https://api.groq.com/openai/v1/audio/transcriptions',{ method:'POST',headers:{'Authorization':`Bearer ${S.groqKey}`},body:fd });
+      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e?.error?.message||'Xato: '+r.status);}
+      const txt=(await r.text()).trim(); showI();
+      if(!txt){toast("Hech narsa eshitilmadi");return;} cfg.onSend(txt);
+    }catch(e){toast('❌ '+e.message);showI();}
+  });
+}
+
+const TEACHER_M=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00e5b0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M15 3.5c1.5.5 2.5 1.8 2.5 3.5"/></svg>`;
+const TEACHER_F=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00e5b0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M9.5 4.5C9 5 8.5 6 8.5 7.5"/><path d="M10 3.5C9 4 8 5.5 8 7"/></svg>`;
+function teacherAvatar(){ return S.accent==='en-GB'?TEACHER_F:TEACHER_M; }
+
+function addMsg(role,text,areaId){
+  $(areaId).querySelectorAll('.empty-hint').forEach(e=>e.remove());
+  const div=document.createElement('div'); div.className=`msg ${role}`;
+  const av=document.createElement('div'); av.className=`av ${role==='ai'?'a':'u'}`;
+  if(role==='ai') av.innerHTML=teacherAvatar(); else av.textContent='👤';
+  const bub=document.createElement('div'); bub.className='bubble';
+  if(role==='ai'){
+    const idx=text.indexOf('❌'); const main=idx>0?text.slice(0,idx).trim():idx===0?'':text; const corr=idx>=0?text.slice(idx).trim():'';
+    if(main){const p=document.createElement('div');p.textContent=main;bub.appendChild(p);}
+    if(corr){const cb=document.createElement('div');cb.className='corr';cb.innerHTML=`<div class="corr-lbl">🔍 Tuzatish</div>${esc(corr)}`;bub.appendChild(cb);}
+    // Tugmalar qatori
+    const btns=document.createElement('div');btns.style.cssText='display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;';
+    const spk=document.createElement('button');spk.className='spk';spk.innerHTML='🔊 Eshitish';spk.onclick=()=>speak(getQ(text));btns.appendChild(spk);
+    const trnBtn=document.createElement('button');trnBtn.className='trn-btn';trnBtn.innerHTML='🇺🇿 Tarjima';
+    const trnBox=document.createElement('div');trnBox.className='trn-box';
+    let translated=false;
+    trnBtn.onclick=async()=>{
+      if(trnBox.classList.contains('show')){trnBox.classList.remove('show');trnBtn.innerHTML='🇺🇿 Tarjima';return;}
+      if(translated){trnBox.classList.add('show');trnBtn.innerHTML='🙈 Yashirish';return;}
+      trnBtn.innerHTML='⏳...';trnBtn.disabled=true;
+      try{
+        const src=main||(corr||text);
+        const r=await groq('Translate the following English text to Uzbek. Return ONLY the Uzbek translation, no explanations.',[{role:'user',content:src}]);
+        trnBox.textContent=r.trim();trnBox.classList.add('show');translated=true;trnBtn.innerHTML='🙈 Yashirish';
+      }catch(e){trnBox.textContent='Tarjima yuklanmadi';trnBox.classList.add('show');}
+      trnBtn.disabled=false;
+    };
+    btns.appendChild(trnBtn);
+    bub.appendChild(btns);
+    bub.appendChild(trnBox);
+  }else{bub.textContent=text;}
+  div.appendChild(av); div.appendChild(bub); $(areaId).appendChild(div); scrollB(areaId);
+}
+function addThink(id){ const d=document.createElement('div');d.className='msg ai';d.id='think'; d.innerHTML=`<div class="av a">${teacherAvatar()}</div><div class="bubble"><div class="think"><span></span><span></span><span></span></div></div>`; $(id).appendChild(d); scrollB(id); }
+function rmThink(){$('think')?.remove();}
+
+let freeHist = [];
+function freeSys() {
+  const S = getState();
+  const fb = S.feedbackLang==='uz' ? 'Give ALL corrections in UZBEK. Speak ENGLISH.' : 'All in English.';
+  return `You are a friendly English speaking coach. Level: ${S.level}. Natural English conversation. Correct errors:\n❌ Xato: [error] ✅ To'g'ri: [correct] 💡 Izoh: [explanation]\n${fb} SHORT — 2-3 sentences.`;
+}
+async function sendFree(text) {
+  addMsg('user', text, 'free-chat'); freeHist.push({role:'user',content:text}); addThink('free-chat');
+  try {
+    const res = await groq(freeSys(), freeHist.slice(-10));
+    rmThink(); freeHist.push({role:'assistant',content:res});
+    addMsg('ai', res, 'free-chat'); setTimeout(() => speak(getQ(res)), 400);
+  } catch(e) { rmThink(); toast('❌ '+e.message); }
+}
+$('free-start-btn').addEventListener('click', async () => {
+  const topic = $('free-topic-inp').value.trim(); freeHist = [];
+  $('free-setup').style.display = 'none'; $('free-chat-wrap').style.display = 'flex';
+  $('free-chat').innerHTML = ''; addThink('free-chat');
+  const startMsg = topic ? `Let's talk about: ${topic}. Start.` : 'Start a friendly English conversation.';
+  try {
+    const res = await groq(freeSys(), [{role:'user',content:startMsg}]);
+    rmThink(); freeHist.push({role:'assistant',content:res});
+    addMsg('ai', res, 'free-chat'); setTimeout(() => speak(getQ(res)), 400);
+  } catch(e) { rmThink(); toast('❌ '+e.message); }
+});
+makeMic({idle:'fi',recst:'fr',rev:'fv',rec:'frec',stop:'fstop',del:'fdel',snd:'fsnd',tbox:'tb-free',wave:'wv-free',onSend:(text)=>sendFree(text)});
+
+</script>
+</body>
+</html>

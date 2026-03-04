@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SpeakUp — Spelling</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body style="margin:0;display:flex;flex-direction:column;min-height:100vh;">
+<div class="app-body" style="flex:1;display:flex;flex-direction:column;max-width:860px;width:100%;margin:0 auto;padding:20px 24px;">
+<div id="spelling-panel" class="panel">
+      <div id="sv-units">
+        <div class="ph"><h2>✍️ Spelling Test</h2><p>Unit tanlang — o'zbekcha so'zni ko'rasiz va inglizcha yozilishini terasiz.</p></div>
+        <div class="unit-grid" id="sunit-grid"></div>
+      </div>
+      <div id="sv-lessons" style="display:none;">
+        <div class="back-btn" id="sback-units">← Unitlarga qaytish</div>
+        <div class="ph"><h2 id="sunit-head"></h2><p id="sunit-sub"></p></div>
+        <div class="lesson-list" id="slessons"></div>
+      </div>
+      <div id="sv-game" style="display:none;flex-direction:column;align-items:center;gap:16px;padding-bottom:20px;">
+        <div class="back-btn" id="sback-lessons" style="align-self:flex-start;">← Darslarga qaytish</div>
+        <div class="sp-wrap" id="sp-wrap"></div>
+        <input class="sp-input" id="sp-input" placeholder="inglizcha yozing..." autocomplete="off" autocorrect="off" spellcheck="false"/>
+        <div class="sp-feedback" id="sp-feedback"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <button class="sp-hint-btn" id="sp-hint-btn">💡 Maslahat</button><button class="btn btn-s btn-sm" id="sp-skip-btn">⏭ O'tkazib yuborish</button>
+        </div>
+      </div>
+      <div id="sv-score" style="display:none;">
+        <div class="back-btn" id="sback-score">← Unitlarga qaytish</div>
+        <div class="score-card">
+          <div class="score-num" id="ss-num">0</div><div class="score-total" id="ss-total">/ 0 ta so'z</div><div class="score-msg" id="ss-msg"></div>
+          <div id="ss-wrong-list" style="margin:16px 0;text-align:left;display:flex;flex-direction:column;gap:6px;"></div>
+          <button class="btn btn-g" id="sp-retry-btn" style="width:auto;margin:0 auto;display:flex;">🔄 Qaytadan</button>
+        </div>
+      </div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+
+const $ = id => document.getElementById(id);
+const toast = (m, d=3000) => {
+  const t = $('toast');
+  if (t) { t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), d); }
+};
+const scrollB = id => { const e = $(id); if(e) e.scrollTop = e.scrollHeight; };
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const setSt = m => window.parent.postMessage({type:'set_status', msg:m}, '*');
+
+function getState() {
+  try { return JSON.parse(localStorage.getItem('su_state') || '{}'); } catch(e) { return {}; }
+}
+function sendState(patch) {
+  const s = getState(); Object.assign(s, patch);
+  localStorage.setItem('su_state', JSON.stringify(s));
+  window.parent.postMessage({type:'state_update', payload:s}, '*');
+}
+function switchTab(name) {
+  window.parent.postMessage({type:'switch_tab', tab:name}, '*');
+}
+async function waitForKey() {
+  return new Promise(resolve => {
+    const s = getState();
+    if (s.groqKey) { resolve(true); return; }
+    window.parent.postMessage({type:'need_key'}, '*');
+    const h = e => {
+      if (e.data && e.data.type === 'set_key') {
+        window.removeEventListener('message', h); resolve(true);
+      }
+    };
+    window.addEventListener('message', h);
+  });
+}
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'set_key') {
+    const s = getState(); s.groqKey = e.data.key;
+    localStorage.setItem('su_state', JSON.stringify(s));
+  }
+});
+
+let curAudio=null;
+async function speak(text,cb){
+  if(!text||!text.trim())return; if(curAudio){curAudio.pause();curAudio.src='';curAudio=null;} window.speechSynthesis.cancel();
+  if(S.elKey) {
+    try{
+      setSt('Ovoz tayyorlanmoqda...');
+      const r=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${S.elVoice}`,{
+        method:'POST', headers:{'xi-api-key':S.elKey,'Content-Type':'application/json','Accept':'audio/mpeg'},
+        body:JSON.stringify({text,model_id:'eleven_turbo_v2',voice_settings:{stability:0.5,similarity_boost:0.75,speed:S.speed}})
+      });
+      if(r.ok){
+        const blob=await r.blob();
+        if(blob.size>500){
+          const url=URL.createObjectURL(blob); curAudio=new Audio(url);
+          if(cb)curAudio.onended=cb; setSt('Tayyor'); await curAudio.play().catch(()=>{}); return;
+        }
+      } else {
+        const err=await r.json().catch(()=>({}));
+        if(err?.detail?.status==='quota_exceeded'){
+          toast('⚠️ ElevenLabs limiti tugadi — brauzer TTS ga o\'tildi'); $('el-status').textContent='⚠️ Oylik limit tugagan! Keyingi oyga qadar brauzer TTS ishlatilmoqda.'; $('el-limit-fill').style.width='100%'; $('el-limit-fill').style.background='#ff5a5a';
+        } else console.warn('EL error:',err?.detail);
+      }
+    }catch(e){ console.warn('EL failed:',e.message); }
+    setSt('Tayyor');
+  }
+  browserSpeak(text,cb);
+}
+
+function browserSpeak(text,cb){
+  const doIt=()=>{
+    const vv=window.speechSynthesis.getVoices(); const u=new SpeechSynthesisUtterance(text); u.lang=S.accent; u.rate=S.speed; u.pitch=1.05;
+    if(S.pickedVoice){ const v=vv.find(x=>x.name===S.pickedVoice.name); if(v)u.voice=v; }
+    if(cb)u.onend=cb; window.speechSynthesis.speak(u);
+  };
+  if(window.speechSynthesis.getVoices().length===0) window.speechSynthesis.addEventListener('voiceschanged',doIt,{once:true}); else doIt();
+}
+function getQ(text){ const lines=text.split('\n').filter(l=>l.trim()); for(let i=lines.length-1;i>=0;i--)if(lines[i].includes('?'))return lines[i]; return lines[lines.length-1]||text; }
+
+async function groq(sys,msgs){
+  if(!S.groqKey){
+    const ok=await waitForKey();
+    if(!ok) throw new Error('API key kiritilmadi');
+  }
+  setSt("AI o'ylayapti...");
+  const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST', headers:{'Authorization':`Bearer ${S.groqKey}`,'Content-Type':'application/json'},
+    body:JSON.stringify({model:S.model,messages:[{role:'system',content:sys},...msgs],temperature:0.82,max_tokens:600})
+  });
+  const d=await r.json(); if(d.error)throw new Error(d.error.message);
+  // Token usage tracking
+  if(d.usage){ trackGroqUsage(d.usage.total_tokens||0); }
+  // Rate limit info from headers
+  const rl={ remain:r.headers.get('x-ratelimit-remaining-tokens'), reset:r.headers.get('x-ratelimit-reset-tokens') };
+  if(rl.remain!==null){ const el=$('groq-rate-info'); if(el) el.textContent=`Rate limit: ${Number(rl.remain).toLocaleString()} token qoldi${rl.reset?' · reset: '+rl.reset:''}`; }
+  setSt('Tayyor'); return d.choices[0].message.content;
+}
+
+// ════════════════════════════
+// GROQ TOKEN TRACKER
+// ════════════════════════════
+function groqUsageKey(type){ const d=new Date(); return type==='day'?`groq_day_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`:`groq_mon_${d.getFullYear()}_${d.getMonth()}`; }
+function trackGroqUsage(tokens){
+  const dk=groqUsageKey('day'), mk=groqUsageKey('mon');
+  const dayUsed=(parseInt(localStorage.getItem(dk)||'0'))+tokens;
+  const monUsed=(parseInt(localStorage.getItem(mk)||'0'))+tokens;
+  localStorage.setItem(dk, dayUsed); localStorage.setItem(mk, monUsed);
+  renderGroqUsage();
+}
+function renderGroqUsage(){
+  const dk=groqUsageKey('day'), mk=groqUsageKey('mon');
+  const dayUsed=parseInt(localStorage.getItem(dk)||'0');
+  const monUsed=parseInt(localStorage.getItem(mk)||'0');
+  const dayLim=parseInt(localStorage.getItem('groq_day_limit')||'14400');
+  const monLim=parseInt(localStorage.getItem('groq_mon_limit')||'500000');
+  const dayPct=Math.min(100,Math.round(dayUsed/dayLim*100));
+  const monPct=Math.min(100,Math.round(monUsed/monLim*100));
+  const $g=id=>document.getElementById(id); if(!$g('groq-day-val'))return;
+  $g('groq-day-val').textContent=dayUsed.toLocaleString();
+  $g('groq-day-limit-lbl').textContent=dayLim.toLocaleString();
+  $g('groq-mon-val').textContent=monUsed.toLocaleString();
+  $g('groq-mon-limit-lbl').textContent=monLim.toLocaleString();
+  $g('groq-day-limit-inp').value=dayLim;
+  $g('groq-mon-limit-inp').value=monLim;
+  const hsEl=document.getElementById('hs-tokens');
+  if(hsEl) hsEl.textContent=dayUsed>999?(dayUsed/1000).toFixed(1)+'K':String(dayUsed||0);
+  const dayBar=$g('groq-day-bar'); if(dayBar){dayBar.style.width=dayPct+'%';
+  dayBar.style.background=dayPct>90?'var(--red)':dayPct>70?'var(--gold)':'var(--accent)';}
+  const monBar=$g('groq-mon-bar'); if(monBar){monBar.style.width=monPct+'%';
+  monBar.style.background=monPct>90?'var(--red)':monPct>70?'var(--gold)':'var(--blue)';}
+}
+// ════════════════════════════
+// MIKROFON VA MESSAGES YORDAMCHILARI
+// ════════════════════════════
+let sharedStream=null;
+async function reqMic(){ try{sharedStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(e){} }
+async function getStream(){
+  if(sharedStream&&sharedStream.active)return sharedStream;
+  sharedStream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,sampleRate:16000}}); return sharedStream;
+}
+function makeMic(cfg){
+  const idle=$(cfg.idle),recst=$(cfg.recst),rev=$(cfg.rev);
+  const recBtn=$(cfg.rec),stopBtn=$(cfg.stop),delBtn=$(cfg.del),sndBtn=$(cfg.snd);
+  const tbox=$(cfg.tbox),wave=$(cfg.wave); let mr=null,chunks=[],ablob=null;
+  const setStatus=(txt,on=false)=>{ if(!tbox)return; tbox.textContent=txt; tbox.classList.toggle('on',on); };
+  const showI=()=>{idle.style.display='flex';recst.style.display='none';rev.style.display='none';wave.classList.remove('show');setStatus('Bosib gapiring...',false);};
+  const showR=()=>{idle.style.display='none';recst.style.display='flex';rev.style.display='none';wave.classList.add('show');};
+  const showV=()=>{idle.style.display='none';recst.style.display='none';rev.style.display='flex';wave.classList.remove('show');};
+  async function startRec(){
+    window.speechSynthesis.cancel(); if(curAudio){curAudio.pause();curAudio=null;} chunks=[];ablob=null; setStatus('🔴 Yozilmoqda...',true);showR();
+    let stream; try{stream=await getStream();}catch(e){toast('❌ Mikrofon ruxsati berilmagan!');showI();return;}
+    const fmts=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4']; const fmt=fmts.find(f=>MediaRecorder.isTypeSupported(f))||'';
+    mr=new MediaRecorder(stream,fmt?{mimeType:fmt}:{}); mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+    mr.onstop=()=>{ ablob=new Blob(chunks,{type:mr.mimeType||'audio/webm'}); const url=URL.createObjectURL(ablob); setStatus('✅ Yozildi — eshiting yoki yuboring',true); showV(); };
+    mr.start(250);
+  }
+  recBtn.addEventListener('click',startRec); stopBtn.addEventListener('click',()=>{if(mr&&mr.state!=='inactive')mr.stop();});
+  delBtn.addEventListener('click',()=>{ablob=null;chunks=[];showI();});
+  sndBtn.addEventListener('click',async()=>{
+    if(!ablob){toast("Ovoz yo'q!");return;}
+    if(!S.groqKey){ const ok=await waitForKey(); if(!ok) return; }
+    const b=ablob;ablob=null;chunks=[]; setStatus('⏳ Tanilmoqda...',true);showI();
+    try{
+      const fd=new FormData(); const ext=b.type.includes('mp4')?'mp4':b.type.includes('ogg')?'ogg':'webm'; const file=new File([b],`a.${ext}`,{type:b.type});
+      fd.append('file',file); fd.append('model','whisper-large-v3-turbo'); fd.append('language','en'); fd.append('response_format','text');
+      const r=await fetch('https://api.groq.com/openai/v1/audio/transcriptions',{ method:'POST',headers:{'Authorization':`Bearer ${S.groqKey}`},body:fd });
+      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e?.error?.message||'Xato: '+r.status);}
+      const txt=(await r.text()).trim(); showI();
+      if(!txt){toast("Hech narsa eshitilmadi");return;} cfg.onSend(txt);
+    }catch(e){toast('❌ '+e.message);showI();}
+  });
+}
+
+const TEACHER_M=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00e5b0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M15 3.5c1.5.5 2.5 1.8 2.5 3.5"/></svg>`;
+const TEACHER_F=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00e5b0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M9.5 4.5C9 5 8.5 6 8.5 7.5"/><path d="M10 3.5C9 4 8 5.5 8 7"/></svg>`;
+function teacherAvatar(){ return S.accent==='en-GB'?TEACHER_F:TEACHER_M; }
+
+function addMsg(role,text,areaId){
+  $(areaId).querySelectorAll('.empty-hint').forEach(e=>e.remove());
+  const div=document.createElement('div'); div.className=`msg ${role}`;
+  const av=document.createElement('div'); av.className=`av ${role==='ai'?'a':'u'}`;
+  if(role==='ai') av.innerHTML=teacherAvatar(); else av.textContent='👤';
+  const bub=document.createElement('div'); bub.className='bubble';
+  if(role==='ai'){
+    const idx=text.indexOf('❌'); const main=idx>0?text.slice(0,idx).trim():idx===0?'':text; const corr=idx>=0?text.slice(idx).trim():'';
+    if(main){const p=document.createElement('div');p.textContent=main;bub.appendChild(p);}
+    if(corr){const cb=document.createElement('div');cb.className='corr';cb.innerHTML=`<div class="corr-lbl">🔍 Tuzatish</div>${esc(corr)}`;bub.appendChild(cb);}
+    // Tugmalar qatori
+    const btns=document.createElement('div');btns.style.cssText='display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;';
+    const spk=document.createElement('button');spk.className='spk';spk.innerHTML='🔊 Eshitish';spk.onclick=()=>speak(getQ(text));btns.appendChild(spk);
+    const trnBtn=document.createElement('button');trnBtn.className='trn-btn';trnBtn.innerHTML='🇺🇿 Tarjima';
+    const trnBox=document.createElement('div');trnBox.className='trn-box';
+    let translated=false;
+    trnBtn.onclick=async()=>{
+      if(trnBox.classList.contains('show')){trnBox.classList.remove('show');trnBtn.innerHTML='🇺🇿 Tarjima';return;}
+      if(translated){trnBox.classList.add('show');trnBtn.innerHTML='🙈 Yashirish';return;}
+      trnBtn.innerHTML='⏳...';trnBtn.disabled=true;
+      try{
+        const src=main||(corr||text);
+        const r=await groq('Translate the following English text to Uzbek. Return ONLY the Uzbek translation, no explanations.',[{role:'user',content:src}]);
+        trnBox.textContent=r.trim();trnBox.classList.add('show');translated=true;trnBtn.innerHTML='🙈 Yashirish';
+      }catch(e){trnBox.textContent='Tarjima yuklanmadi';trnBox.classList.add('show');}
+      trnBtn.disabled=false;
+    };
+    btns.appendChild(trnBtn);
+    bub.appendChild(btns);
+    bub.appendChild(trnBox);
+  }else{bub.textContent=text;}
+  div.appendChild(av); div.appendChild(bub); $(areaId).appendChild(div); scrollB(areaId);
+}
+function addThink(id){ const d=document.createElement('div');d.className='msg ai';d.id='think'; d.innerHTML=`<div class="av a">${teacherAvatar()}</div><div class="bubble"><div class="think"><span></span><span></span><span></span></div></div>`; $(id).appendChild(d); scrollB(id); }
+function rmThink(){$('think')?.remove();}
+const BOOK = [
+  { unit:0, label:"Welcome", emoji:"👋", topics:"Hello, numbers, alphabet, classroom",
+    lessons:[
+      { tag:"W.A", title:"Hello!", focus:"Greetings and introductions", vocab:[ {en:"hello",uz:"salom",emoji:"👋"}, {en:"goodbye",uz:"xayr",emoji:"🚪"}, {en:"name",uz:"ism",emoji:"🏷️"}, {en:"please",uz:"iltimos",emoji:"🙏"}, {en:"thank you",uz:"rahmat",emoji:"😊"}, {en:"sorry",uz:"kechirasiz",emoji:"😔"}, {en:"yes",uz:"ha",emoji:"✅"}, {en:"no",uz:"yo'q",emoji:"❌"}, {en:"good morning",uz:"xayrli tong",emoji:"🌅"}, {en:"good night",uz:"xayrli tun",emoji:"🌙"} ]},
+      { tag:"W.B", title:"Numbers & Letters", focus:"Numbers 1-20 and alphabet", vocab:[ {en:"one",uz:"bir",emoji:"1️⃣"}, {en:"two",uz:"ikki",emoji:"2️⃣"}, {en:"three",uz:"uch",emoji:"3️⃣"}, {en:"four",uz:"to'rt",emoji:"4️⃣"}, {en:"five",uz:"besh",emoji:"5️⃣"}, {en:"six",uz:"olti",emoji:"6️⃣"}, {en:"seven",uz:"yetti",emoji:"7️⃣"}, {en:"eight",uz:"sakkiz",emoji:"8️⃣"}, {en:"nine",uz:"to'qqiz",emoji:"9️⃣"}, {en:"ten",uz:"o'n",emoji:"🔟"} ]},
+      { tag:"W.C", title:"In the classroom", focus:"Classroom objects", vocab:[ {en:"pen",uz:"ruchka",emoji:"🖊️"}, {en:"book",uz:"kitob",emoji:"📖"}, {en:"desk",uz:"stol",emoji:"🪑"}, {en:"chair",uz:"stul",emoji:"💺"}, {en:"board",uz:"doska",emoji:"📋"}, {en:"teacher",uz:"o'qituvchi",emoji:"👩‍🏫"}, {en:"student",uz:"talaba",emoji:"🎓"}, {en:"window",uz:"deraza",emoji:"🪟"}, {en:"door",uz:"eshik",emoji:"🚪"}, {en:"phone",uz:"telefon",emoji:"📱"} ]}
+    ]
+  },
+  { unit:1, label:"First meetings", emoji:"🤝", topics:"Introductions, be, countries, alphabet",
+    lessons:[
+      { tag:"1A", title:"On business or on holiday?", focus:"Verb be (I/you)", vocab:[ {en:"business",uz:"biznes",emoji:"💼"}, {en:"holiday",uz:"ta'til",emoji:"🏖️"}, {en:"study",uz:"o'qish",emoji:"📚"}, {en:"meet",uz:"tanishmoq",emoji:"🤝"}, {en:"nice",uz:"yoqimli",emoji:"😊"}, {en:"hello",uz:"salom",emoji:"👋"}, {en:"hi",uz:"salom",emoji:"👋"}, {en:"goodbye",uz:"xayr",emoji:"🚪"}, {en:"am",uz:"man (fe'l)",emoji:"👤"}, {en:"are",uz:"siz (fe'l)",emoji:"👥"} ]},
+      { tag:"1B", title:"Where are you from?", focus:"Verb be (we/you), Countries", vocab:[ {en:"country",uz:"davlat",emoji:"🗺️"}, {en:"city",uz:"shahar",emoji:"🏙️"}, {en:"where",uz:"qayerda",emoji:"📍"}, {en:"from",uz:"dan",emoji:"🛫"}, {en:"number",uz:"raqam",emoji:"🔢"}, {en:"zero",uz:"nol",emoji:"0️⃣"}, {en:"one",uz:"bir",emoji:"1️⃣"}, {en:"two",uz:"ikki",emoji:"2️⃣"}, {en:"three",uz:"uch",emoji:"3️⃣"}, {en:"four",uz:"to'rt",emoji:"4️⃣"} ]},
+      { tag:"1C", title:"How do you spell that?", focus:"Alphabet, Question words", vocab:[ {en:"spell",uz:"harflab aytmoq",emoji:"🔤"}, {en:"name",uz:"ism",emoji:"🏷️"}, {en:"phone",uz:"telefon",emoji:"📱"}, {en:"email",uz:"elektron pochta",emoji:"📧"}, {en:"address",uz:"manzil",emoji:"🏠"}, {en:"how",uz:"qanday",emoji:"❓"}, {en:"what",uz:"nima",emoji:"❓"}, {en:"when",uz:"qachon",emoji:"⏰"}, {en:"old",uz:"yosh/qari",emoji:"🎂"}, {en:"birthday",uz:"tug'ilgan kun",emoji:"🎁"} ]},
+      { tag:"1D", title:"Speaking and writing", focus:"Saying hello and goodbye", vocab:[ {en:"day",uz:"kun",emoji:"☀️"}, {en:"later",uz:"keyinroq",emoji:"🕒"}, {en:"morning",uz:"ertalab",emoji:"🌅"}, {en:"fine",uz:"yaxshi",emoji:"👍"}, {en:"thanks",uz:"rahmat",emoji:"🙏"}, {en:"great",uz:"zo'r",emoji:"🤩"}, {en:"first",uz:"birinchi",emoji:"🥇"}, {en:"last",uz:"oxirgi",emoji:"🏁"}, {en:"visit",uz:"tashrif",emoji:"🚶"}, {en:"signature",uz:"imzo",emoji:"✍️"} ]}
+    ]
+  },
+  { unit:2, label:"Things", emoji:"🎒", topics:"Possessions, colours, prices",
+    lessons:[
+      { tag:"2A", title:"My things", focus:"Personal possessions", vocab:[ {en:"phone",uz:"telefon",emoji:"📱"}, {en:"bag",uz:"sumka",emoji:"👜"}, {en:"keys",uz:"kalitlar",emoji:"🗝️"}, {en:"wallet",uz:"hamyon",emoji:"👛"}, {en:"laptop",uz:"noutbuk",emoji:"💻"}, {en:"umbrella",uz:"soyabon",emoji:"☂️"}, {en:"watch",uz:"soat",emoji:"⌚"}, {en:"glasses",uz:"ko'zoynak",emoji:"👓"}, {en:"camera",uz:"kamera",emoji:"📷"}, {en:"headphones",uz:"quloqchin",emoji:"🎧"} ]},
+      { tag:"2B", title:"Colours and adjectives", focus:"Describing objects", vocab:[ {en:"red",uz:"qizil",emoji:"🔴"}, {en:"blue",uz:"ko'k",emoji:"🔵"}, {en:"green",uz:"yashil",emoji:"🟢"}, {en:"black",uz:"qora",emoji:"⚫"}, {en:"white",uz:"oq",emoji:"⚪"}, {en:"yellow",uz:"sariq",emoji:"🟡"}, {en:"orange",uz:"to'q sariq",emoji:"🟠"}, {en:"pink",uz:"pushti",emoji:"🌸"}, {en:"big",uz:"katta",emoji:"🐘"}, {en:"small",uz:"kichik",emoji:"🐭"} ]},
+      { tag:"2C", title:"How much is it?", focus:"Shopping and prices", vocab:[ {en:"price",uz:"narx",emoji:"💰"}, {en:"cheap",uz:"arzon",emoji:"🏷️"}, {en:"expensive",uz:"qimmat",emoji:"💎"}, {en:"money",uz:"pul",emoji:"💵"}, {en:"shop",uz:"do'do'kon",emoji:"🏪"}, {en:"market",uz:"bozor",emoji:"🛒"}, {en:"buy",uz:"sotib olmoq",emoji:"🛍️"}, {en:"sell",uz:"sotmoq",emoji:"📦"}, {en:"pay",uz:"to'lamoq",emoji:"💳"}, {en:"free",uz:"bepul",emoji:"🆓"} ]},
+      { tag:"2D", title:"Can I help you?", focus:"Shopping dialogues", vocab:[ {en:"size",uz:"o'lcham",emoji:"📏"}, {en:"colour",uz:"rang",emoji:"🎨"}, {en:"receipt",uz:"kvitansiya",emoji:"🧾"}, {en:"change",uz:"qoldiq pul",emoji:"🪙"}, {en:"card",uz:"karta",emoji:"💳"}, {en:"cash",uz:"naqd pul",emoji:"💵"}, {en:"discount",uz:"chegirma",emoji:"🏷️"}, {en:"sale",uz:"sotuv",emoji:"🔥"}, {en:"bag",uz:"paket",emoji:"🛍️"}, {en:"gift",uz:"sovg'a",emoji:"🎁"} ]}
+    ]
+  },
+  { unit:3, label:"Around the world", emoji:"🌍", topics:"Places, transport, directions",
+    lessons:[
+      { tag:"3A", title:"Amazing places", focus:"Describing places", vocab:[ {en:"mountain",uz:"tog'",emoji:"⛰️"}, {en:"beach",uz:"plyaj",emoji:"🏖️"}, {en:"river",uz:"daryo",emoji:"🏞️"}, {en:"lake",uz:"ko'l",emoji:"🌊"}, {en:"forest",uz:"o'rmon",emoji:"🌲"}, {en:"desert",uz:"cho'l",emoji:"🏜️"}, {en:"island",uz:"orol",emoji:"🏝️"}, {en:"city",uz:"shahar",emoji:"🏙️"}, {en:"village",uz:"qishloq",emoji:"🏡"}, {en:"waterfall",uz:"sharshar",emoji:"💧"} ]},
+      { tag:"3B", title:"Transport", focus:"Types of transport", vocab:[ {en:"bus",uz:"avtobus",emoji:"🚌"}, {en:"train",uz:"poyezd",emoji:"🚂"}, {en:"plane",uz:"samolyot",emoji:"✈️"}, {en:"car",uz:"mashina",emoji:"🚗"}, {en:"taxi",uz:"taksi",emoji:"🚕"}, {en:"bike",uz:"velosiped",emoji:"🚲"}, {en:"boat",uz:"qayiq",emoji:"⛵"}, {en:"metro",uz:"metro",emoji:"🚇"}, {en:"ship",uz:"kema",emoji:"🚢"}, {en:"ticket",uz:"chipta",emoji:"🎫"} ]},
+      { tag:"3C", title:"Directions", focus:"Giving directions", vocab:[ {en:"left",uz:"chap",emoji:"⬅️"}, {en:"right",uz:"o'ng",emoji:"➡️"}, {en:"straight",uz:"to'g'ri",emoji:"⬆️"}, {en:"turn",uz:"burilmoq",emoji:"↩️"}, {en:"near",uz:"yaqin",emoji:"📍"}, {en:"far",uz:"uzoq",emoji:"🗺️"}, {en:"street",uz:"ko'cha",emoji:"🛣️"}, {en:"road",uz:"yo'l",emoji:"🛤️"}, {en:"bridge",uz:"ko'prik",emoji:"🌉"}, {en:"map",uz:"xarita",emoji:"🗺️"} ]},
+      { tag:"3D", title:"At the hotel", focus:"Hotel conversations", vocab:[ {en:"hotel",uz:"mehmonxona",emoji:"🏨"}, {en:"room",uz:"xona",emoji:"🛏️"}, {en:"key",uz:"kalit",emoji:"🗝️"}, {en:"floor",uz:"qavat",emoji:"🏢"}, {en:"lift",uz:"lift",emoji:"🛗"}, {en:"breakfast",uz:"nonushta",emoji:"🍳"}, {en:"pool",uz:"basseyn",emoji:"🏊"}, {en:"parking",uz:"avtoturargoh",emoji:"🅿️"}, {en:"check in",uz:"ro'yxatdan o'tish",emoji:"✅"}, {en:"reservation",uz:"bron",emoji:"📅"} ]}
+    ]
+  },
+  { unit:4, label:"My life", emoji:"📅", topics:"Daily life, present simple, transport",
+    lessons:[
+      { tag:"4A", title:"About me", focus:"Present simple positive", vocab:[ {en:"get up",uz:"uyg'onmoq",emoji:"⏰"}, {en:"listen",uz:"eshitmoq",emoji:"🎧"}, {en:"start",uz:"boshlamoq",emoji:"▶️"}, {en:"finish",uz:"tugatmoq",emoji:"⏹️"}, {en:"live",uz:"yashamoq",emoji:"🏠"}, {en:"work",uz:"ishlamoq",emoji:"💼"}, {en:"study",uz:"o'qimoq",emoji:"📖"}, {en:"watch",uz:"tomosha qilmoq",emoji:"📺"}, {en:"read",uz:"o'qimoq (kitob)",emoji:"📚"}, {en:"have",uz:"ega bo'lmoq",emoji:"🤲"} ]},
+      { tag:"4B", title:"Journeys", focus:"Present simple negative, transport", vocab:[ {en:"bus",uz:"avtobus",emoji:"🚌"}, {en:"train",uz:"poyezd",emoji:"🚆"}, {en:"car",uz:"mashina",emoji:"🚗"}, {en:"ferry",uz:"parom",emoji:"⛴️"}, {en:"walk",uz:"piyoda yurmoq",emoji:"🚶"}, {en:"cycle",uz:"velosiped uchmoq",emoji:"🚲"}, {en:"drive",uz:"haydamoq",emoji:"🚘"}, {en:"transport",uz:"transport",emoji:"🚉"}, {en:"journey",uz:"sayohat",emoji:"🛣️"}, {en:"travel",uz:"sayohat qilmoq",emoji:"🧳"} ]},
+      { tag:"4C", title:"My day", focus:"Present simple yes/no questions", vocab:[ {en:"weekend",uz:"dam olish kunlari",emoji:"🎉"}, {en:"morning",uz:"ertalab",emoji:"🌅"}, {en:"afternoon",uz:"tushdan keyin",emoji:"☀️"}, {en:"evening",uz:"kechqurun",emoji:"🌆"}, {en:"lunch",uz:"tushlik",emoji:"🥗"}, {en:"dinner",uz:"kechki ovqat",emoji:"🍽️"}, {en:"breakfast",uz:"nonushta",emoji:"🍳"}, {en:"meeting",uz:"uchrashuv",emoji:"🤝"}, {en:"early",uz:"erta",emoji:"🌄"}, {en:"late",uz:"kech",emoji:"🌙"} ]},
+      { tag:"4D", title:"Speaking and writing", focus:"In a shop", vocab:[ {en:"shop",uz:"do'kon",emoji:"🏪"}, {en:"price",uz:"narx",emoji:"💰"}, {en:"buy",uz:"sotib olmoq",emoji:"🛍️"}, {en:"dollars",uz:"dollar",emoji:"💵"}, {en:"pounds",uz:"funt",emoji:"💷"}, {en:"help",uz:"yordam bermoq",emoji:"💁"}, {en:"look",uz:"qaramoq",emoji:"👀"}, {en:"take",uz:"olmoq",emoji:"🛒"}, {en:"everything",uz:"hammasi",emoji:"📦"}, {en:"receipt",uz:"chek/kvitansiya",emoji:"🧾"} ]}
+    ]
+  },
+  { unit:5, label:"Style and design", emoji:"🎨", topics:"Clothes, architecture, body parts, travel info",
+    lessons:[
+      { tag:"5A", title:"Clothes style", focus:"Adverbs of frequency, clothes", vocab:[ {en:"clothes",uz:"kiyimlar",emoji:"👕"}, {en:"shoes",uz:"poyabzal",emoji:"👞"}, {en:"jacket",uz:"kurtka",emoji:"🧥"}, {en:"dress",uz:"ko'ylak",emoji:"👗"}, {en:"jeans",uz:"jinsi",emoji:"👖"}, {en:"shirt",uz:"ko'ylak (erkaklar)",emoji:"👔"}, {en:"trousers",uz:"shim",emoji:"👖"}, {en:"always",uz:"har doim",emoji:"💯"}, {en:"usually",uz:"odatda",emoji:"📈"}, {en:"never",uz:"hech qachon",emoji:"🚫"} ]},
+      { tag:"5B", title:"Amazing architecture", focus:"Wh-questions, buildings", vocab:[ {en:"architecture",uz:"arxitektura",emoji:"🏛️"}, {en:"building",uz:"bino",emoji:"🏢"}, {en:"modern",uz:"zamonaviy",emoji:"🏙️"}, {en:"traditional",uz:"an'anaviy",emoji:"🛖"}, {en:"unusual",uz:"g'ayrioddiy",emoji:"😲"}, {en:"What",uz:"nima",emoji:"❓"}, {en:"Where",uz:"qayerda",emoji:"📍"}, {en:"When",uz:"qachon",emoji:"⏰"}, {en:"Why",uz:"nega",emoji:"🤷"}, {en:"How",uz:"qanday",emoji:"🔧"} ]},
+      { tag:"5C", title:"Styles around the world", focus:"Parts of the body, Present simple", vocab:[ {en:"arm",uz:"qo'l",emoji:"💪"}, {en:"body",uz:"tana",emoji:"🧍"}, {en:"face",uz:"yuz",emoji:"🙂"}, {en:"foot",uz:"oyoq (tagi)",emoji:"🦶"}, {en:"hair",uz:"soch",emoji:"💇"}, {en:"hand",uz:"qo'l (kaft)",emoji:"🖐️"}, {en:"head",uz:"bosh",emoji:"🗣️"}, {en:"leg",uz:"oyoq",emoji:"🦵"}, {en:"really",uz:"haqiqatan ham",emoji:"❗"}, {en:"very",uz:"juda",emoji:"🌟"} ]},
+      { tag:"5D", title:"Travel information", focus:"Travel arrangements, texting", vocab:[ {en:"ticket",uz:"chipta",emoji:"🎫"}, {en:"bus",uz:"avtobus",emoji:"🚌"}, {en:"train",uz:"poyezd",emoji:"🚂"}, {en:"platform",uz:"platforma",emoji:"🚉"}, {en:"station",uz:"vokzal",emoji:"🚉"}, {en:"leave",uz:"jo'nab ketmoq",emoji:"🛫"}, {en:"arrive",uz:"yetib kelmoq",emoji:"🛬"}, {en:"buy",uz:"sotib olmoq",emoji:"💵"}, {en:"message",uz:"xabar",emoji:"💬"}, {en:"meet",uz:"uchrashmoq",emoji:"🤝"} ]}
+    ]
+  },
+  { unit:6, label:"Places and facilities", emoji:"🏙️", topics:"Places, hotel facilities, furniture, problems",
+    lessons:[
+      { tag:"6A", title:"Two towns", focus:"there is / there are, places", vocab:[ {en:"town",uz:"shaharcha",emoji:"🏘️"}, {en:"city",uz:"shahar",emoji:"🏙️"}, {en:"bank",uz:"bank",emoji:"🏦"}, {en:"park",uz:"bog'",emoji:"🌳"}, {en:"bakery",uz:"novvoyxona",emoji:"🥐"}, {en:"museum",uz:"muzey",emoji:"🏛️"}, {en:"shop",uz:"do'kon",emoji:"🏪"}, {en:"restaurant",uz:"restoran",emoji:"🍽️"}, {en:"hotel",uz:"mehmonxona",emoji:"🏨"}, {en:"cinema",uz:"kino",emoji:"🎬"} ]},
+      { tag:"6B", title:"Is there Wi-fi?", focus:"Is there...? / Are there...?, hotel facilities", vocab:[ {en:"gym",uz:"sport zali",emoji:"🏋️"}, {en:"lift",uz:"lift",emoji:"🛗"}, {en:"safe",uz:"seyf",emoji:"🔐"}, {en:"towel",uz:"sochiq",emoji:"🛁"}, {en:"bath",uz:"vanna",emoji:"🛀"}, {en:"shower",uz:"dush",emoji:"🚿"}, {en:"car park",uz:"avtoturargoh",emoji:"🅿️"}, {en:"iron",uz:"dazmol",emoji:"👔"}, {en:"refreshments",uz:"yengil tamaddi",emoji:"🍹"}, {en:"Wi-fi",uz:"Wi-fi",emoji:"📶"} ]},
+      { tag:"6C", title:"Has each flat got a kitchen?", focus:"each and all the, furniture", vocab:[ {en:"kitchen",uz:"oshxona",emoji:"🍳"}, {en:"bedroom",uz:"yotoqxona",emoji:"🛏️"}, {en:"bathroom",uz:"vanna xonasi",emoji:"🚽"}, {en:"balcony",uz:"balkon",emoji:"🏢"}, {en:"bed",uz:"karavot",emoji:"🛌"}, {en:"chair",uz:"stul",emoji:"🪑"}, {en:"fridge",uz:"muzlatgich",emoji:"🧊"}, {en:"sofa",uz:"divan",emoji:"🛋️"}, {en:"table",uz:"stol",emoji:"🪑"}, {en:"microwave",uz:"mikroto'lqinli pech",emoji:"♨️"} ]},
+      { tag:"6D", title:"Speaking and writing", focus:"Explaining problems", vocab:[ {en:"problem",uz:"muammo",emoji:"⚠️"}, {en:"hot",uz:"issiq",emoji:"🥵"}, {en:"cold",uz:"sovuq",emoji:"🥶"}, {en:"noisy",uz:"shovqinli",emoji:"🔊"}, {en:"broken",uz:"singen",emoji:"🔨"}, {en:"dirty",uz:"iflos",emoji:"🗑️"}, {en:"help",uz:"yordam bermoq",emoji:"🆘"}, {en:"send",uz:"yubormoq",emoji:"📤"}, {en:"try",uz:"sinab ko'rmoq",emoji:"🔄"}, {en:"code",uz:"kod",emoji:"🔢"} ]}
+    ]
+  },
+  { unit:7, label:"Skills and interests", emoji:"🎸", topics:"Abilities, adverbs, hobbies, requests",
+    lessons:[
+      { tag:"7A", title:"She can paint", focus:"can/can't, skills", vocab:[ {en:"swim",uz:"suzmoq",emoji:"🏊"}, {en:"play",uz:"o'ynamoq/chalmoq",emoji:"🎮"}, {en:"guitar",uz:"gitara",emoji:"🎸"}, {en:"sing",uz:"kuylamoq",emoji:"🎤"}, {en:"dance",uz:"raqsga tushmoq",emoji:"💃"}, {en:"paint",uz:"rasm chizmoq",emoji:"🎨"}, {en:"drive",uz:"mashina haydamoq",emoji:"🚗"}, {en:"cook",uz:"ovqat pishirmoq",emoji:"👨‍🍳"}, {en:"ride",uz:"minmoq (velosiped)",emoji:"🚲"}, {en:"type",uz:"harf termoq",emoji:"⌨️"} ]},
+      { tag:"7B", title:"Can you help?", focus:"can questions, adverbs of manner", vocab:[ {en:"well",uz:"yaxshi",emoji:"👍"}, {en:"badly",uz:"yomon",emoji:"👎"}, {en:"fast",uz:"tez",emoji:"⚡"}, {en:"slowly",uz:"sekin",emoji:"🐢"}, {en:"easily",uz:"osonlik bilan",emoji:"🎈"}, {en:"hard",uz:"qattiq/qiyin",emoji:"💪"}, {en:"perfectly",uz:"mukammal",emoji:"✨"}, {en:"quickly",uz:"tezda",emoji:"🏃"}, {en:"carefully",uz:"ehtiyotkorlik bilan",emoji:"🧐"}, {en:"beautifully",uz:"chiroyli qilib",emoji:"🌸"} ]},
+      { tag:"7C", title:"I like going out", focus:"like + -ing, hobbies", vocab:[ {en:"read",uz:"o'qimoq",emoji:"📖"}, {en:"travel",uz:"sayohat qilmoq",emoji:"✈️"}, {en:"shop",uz:"xarid qilmoq",emoji:"🛍️"}, {en:"watch",uz:"tomosha qilmoq",emoji:"📺"}, {en:"listen",uz:"eshitmoq",emoji:"🎧"}, {en:"go out",uz:"ko'chaga chiqmoq",emoji:"🚶"}, {en:"take photos",uz:"rasmga olmoq",emoji:"📸"}, {en:"garden",uz:"bog'da ishlamoq",emoji:"🌱"}, {en:"hate",uz:"yomon ko'rmoq",emoji:"😠"}, {en:"love",uz:"sevmoq",emoji:"❤️"} ]},
+      { tag:"7D", title:"Speaking and writing", focus:"Requests and answers", vocab:[ {en:"help",uz:"yordam",emoji:"🤝"}, {en:"water",uz:"suv",emoji:"💧"}, {en:"way",uz:"yo'l",emoji:"🛣️"}, {en:"call",uz:"chaqirmoq/qo'ng'iroq",emoji:"📞"}, {en:"taxi",uz:"taksi",emoji:"🚕"}, {en:"chair",uz:"stul",emoji:"🪑"}, {en:"sure",uz:"albatta",emoji:"✅"}, {en:"course",uz:"albatta (of course)",emoji:"✔️"}, {en:"problem",uz:"muammo",emoji:"⚠️"}, {en:"sorry",uz:"kechirasiz",emoji:"😔"} ]}
+    ]
+  },
+  { unit:8, label:"Our past", emoji:"🕰️", topics:"Past simple be, regular verbs, pronouns, special occasions",
+    lessons:[
+      { tag:"8A", title:"When we were seven", focus:"was / were", vocab:[ {en:"was",uz:"edim/edi",emoji:"👤"}, {en:"were",uz:"edik/edingiz",emoji:"👥"}, {en:"yesterday",uz:"kecha",emoji:"🔙"}, {en:"rich",uz:"boy",emoji:"💰"}, {en:"poor",uz:"kambag'al",emoji:"🪙"}, {en:"happy",uz:"xursand",emoji:"😊"}, {en:"sad",uz:"xafa",emoji:"😢"}, {en:"lucky",uz:"omadli",emoji:"🍀"}, {en:"last night",uz:"o'tgan tunda",emoji:"🌙"}, {en:"last year",uz:"o'tgan yili",emoji:"📆"} ]},
+      { tag:"8B", title:"Lives from the past", focus:"Past simple regular verbs", vocab:[ {en:"played",uz:"o'ynadi",emoji:"🎮"}, {en:"worked",uz:"ishladi",emoji:"💼"}, {en:"lived",uz:"yashadi",emoji:"🏠"}, {en:"started",uz:"boshladi",emoji:"▶️"}, {en:"finished",uz:"tugatdi",emoji:"⏹️"}, {en:"studied",uz:"o'qidi (o'rgandi)",emoji:"📚"}, {en:"watched",uz:"tomosha qildi",emoji:"📺"}, {en:"listened",uz:"eshitdi",emoji:"🎧"}, {en:"wanted",uz:"xohladi",emoji:"🙏"}, {en:"liked",uz:"yoqtirdi",emoji:"❤️"} ]},
+      { tag:"8C", title:"Special moments", focus:"Object pronouns", vocab:[ {en:"me",uz:"meni/menga",emoji:"🙋"}, {en:"you",uz:"seni/senga",emoji:"👉"}, {en:"him",uz:"uni/unga (erkak)",emoji:"👨"}, {en:"her",uz:"uni/unga (ayol)",emoji:"👩"}, {en:"it",uz:"uni/unga (narsa)",emoji:"📦"}, {en:"us",uz:"bizni/bizga",emoji:"👫"}, {en:"them",uz:"ularni/ularga",emoji:"👪"}, {en:"invite",uz:"taklif qilmoq",emoji:"💌"}, {en:"call",uz:"qo'ng'iroq qilmoq",emoji:"📞"}, {en:"tell",uz:"aytmoq",emoji:"🗣️"} ]},
+      { tag:"8D", title:"Speaking and writing", focus:"Special occasions", vocab:[ {en:"congratulations",uz:"tabriklayman",emoji:"🎉"}, {en:"happy birthday",uz:"tug'ilgan kuningiz bilan",emoji:"🎂"}, {en:"cheers",uz:"oldik (qadah so'zi)",emoji:"🥂"}, {en:"good luck",uz:"omad",emoji:"🍀"}, {en:"great",uz:"zo'r",emoji:"🤩"}, {en:"never mind",uz:"qisi yo'q/hechqisi yo'q",emoji:"🤷"}, {en:"sorry",uz:"kechirasiz",emoji:"😔"}, {en:"glad",uz:"xursand",emoji:"😄"}, {en:"hear",uz:"eshitmoq",emoji:"👂"}, {en:"test",uz:"sinov",emoji:"📝"} ]}
+    ]
+  },
+  { unit:9, label:"Unusual stories", emoji:"📰", topics:"Past simple irregular, negatives, ago, weather",
+    lessons:[
+      { tag:"9A", title:"Happy memories", focus:"Past simple irregular verbs", vocab:[ {en:"went",uz:"bordi",emoji:"🚶"}, {en:"had",uz:"ega edi",emoji:"🤲"}, {en:"met",uz:"uchratdi",emoji:"🤝"}, {en:"said",uz:"aytdi",emoji:"🗣️"}, {en:"got",uz:"oldi",emoji:"📥"}, {en:"lost",uz:"yo'qotdi",emoji:"🔍"}, {en:"left",uz:"tark etdi",emoji:"🚪"}, {en:"came",uz:"keldi",emoji:"🏃"}, {en:"fell",uz:"yiqildi",emoji:"🤕"}, {en:"saw",uz:"ko'rdi",emoji:"👀"} ]},
+      { tag:"9B", title:"A good excuse", focus:"Past simple negatives and questions", vocab:[ {en:"didn't",uz:"qilmadi",emoji:"❌"}, {en:"did",uz:"qildimi?",emoji:"❓"}, {en:"win",uz:"yutmoq",emoji:"🏆"}, {en:"lose",uz:"yutqazmoq",emoji:"📉"}, {en:"buy",uz:"sotib olmoq",emoji:"🛍️"}, {en:"catch",uz:"tutmoq/ulgurmoq",emoji:"🚆"}, {en:"sleep",uz:"uxlamoq",emoji:"😴"}, {en:"understand",uz:"tushunmoq",emoji:"🧠"}, {en:"answer",uz:"javob bermoq",emoji:"✅"}, {en:"forget",uz:"unutmoq",emoji:"🤦"} ]},
+      { tag:"9C", title:"News stories", focus:"ago, time expressions", vocab:[ {en:"ago",uz:"oldin",emoji:"⏪"}, {en:"yesterday",uz:"kecha",emoji:"🔙"}, {en:"last week",uz:"o'tgan hafta",emoji:"📅"}, {en:"last year",uz:"o'tgan yil",emoji:"📆"}, {en:"month",uz:"oy",emoji:"🗓️"}, {en:"century",uz:"asr",emoji:"🏛️"}, {en:"decade",uz:"o'n yillik",emoji:"⏳"}, {en:"history",uz:"tarix",emoji:"📜"}, {en:"time",uz:"vaqt",emoji:"⏱️"}, {en:"past",uz:"o'tmish",emoji:"🕰️"} ]},
+      { tag:"9D", title:"Speaking and writing", focus:"The weather", vocab:[ {en:"sunny",uz:"quyoshli",emoji:"☀️"}, {en:"cloudy",uz:"bulutli",emoji:"☁️"}, {en:"rainy",uz:"yomg'irli",emoji:"🌧️"}, {en:"windy",uz:"shamolli",emoji:"🌬️"}, {en:"snowy",uz:"qorli",emoji:"❄️"}, {en:"stormy",uz:"bo'ronli",emoji:"⛈️"}, {en:"hot",uz:"issiq",emoji:"🥵"}, {en:"cold",uz:"sovuq",emoji:"🥶"}, {en:"warm",uz:"iliq",emoji:"😊"}, {en:"weather",uz:"ob-havo",emoji:"🌤️"} ]}
+    ]
+  },
+ { unit:10, label:"New places, new projects", emoji:"✈️", topics:"Future plans, travel, suggestions",
+    lessons:[
+      { tag:"10A", title:"A new life", focus:"be going to", vocab:[ {en:"move house",uz:"ko'chib o'tmoq",emoji:"📦"}, {en:"learn",uz:"o'rganmoq",emoji:"📖"}, {en:"language",uz:"til",emoji:"🗣️"}, {en:"get a job",uz:"ishga kirmoq",emoji:"💼"}, {en:"travel",uz:"sayohat qilmoq",emoji:"🌍"}, {en:"buy",uz:"sotib olmoq",emoji:"💳"}, {en:"future",uz:"kelajak",emoji:"🔮"}, {en:"soon",uz:"tez orada",emoji:"⏳"}, {en:"course",uz:"kurs",emoji:"🎓"}, {en:"tomorrow",uz:"ertaga",emoji:"📅"} ]},
+      { tag:"10B", title:"What are you going to do?", focus:"be going to questions, time expressions", vocab:[ {en:"arrive",uz:"yetib kelmoq",emoji:"🛬"}, {en:"leave",uz:"tark etmoq/ketmoq",emoji:"🛫"}, {en:"visit",uz:"tashrif buyurmoq",emoji:"🚶"}, {en:"stay",uz:"qolmoq",emoji:"🏨"}, {en:"return",uz:"qaytmoq",emoji:"🔄"}, {en:"next week",uz:"kelasi hafta",emoji:"📆"}, {en:"next month",uz:"kelasi oy",emoji:"🗓️"}, {en:"tonight",uz:"bugun tunda",emoji:"🌙"}, {en:"weekend",uz:"dam olish kuni",emoji:"🎉"}, {en:"tomorrow morning",uz:"ertaga ertalab",emoji:"🌅"} ]},
+      { tag:"10C", title:"A city break", focus:"Travel collocations", vocab:[ {en:"go sightseeing",uz:"diqqatga sazovor joylarni ko'rmoq",emoji:"📸"}, {en:"rent a car",uz:"mashina ijaraga olmoq",emoji:"🚘"}, {en:"stay in a hotel",uz:"mehmonxonada qolmoq",emoji:"🏨"}, {en:"visit a museum",uz:"muzeyga bormoq",emoji:"🏛️"}, {en:"take photos",uz:"rasmga olmoq",emoji:"📷"}, {en:"buy souvenirs",uz:"esdalik sovg'alar olmoq",emoji:"🎁"}, {en:"have a meal",uz:"ovqatlanmoq",emoji:"🍽️"}, {en:"guidebook",uz:"yo'riqnoma kitobi",emoji:"🗺️"}, {en:"tourist",uz:"sayyoh",emoji:"🎒"}, {en:"map",uz:"xarita",emoji:"🗺️"} ]},
+      { tag:"10D", title:"Speaking and writing", focus:"Making suggestions", vocab:[ {en:"why don't we",uz:"nega biz... qilmaymiz",emoji:"🤔"}, {en:"let's",uz:"keling... qilaylik",emoji:"🤝"}, {en:"how about",uz:"... haqida nima deysiz",emoji:"🤷"}, {en:"idea",uz:"g'oya/fikr",emoji:"💡"}, {en:"agree",uz:"rozi bo'lmoq",emoji:"✅"}, {en:"suggest",uz:"taklif qilmoq",emoji:"💬"}, {en:"excellent",uz:"a'lo",emoji:"🌟"}, {en:"perfect",uz:"mukammal",emoji:"✨"}, {en:"plan",uz:"reja",emoji:"📋"}, {en:"together",uz:"birgalikda",emoji:"👫"} ]}
+    ]
+  }
+];
+
+// ════════════════════════════
+// STATE & HELPERS
+// ════════════════════════════
+function renderSpellUnits(){
+  const grid=$('spell-unit-grid'); if(!grid) return; grid.innerHTML='';
+  BOOK.forEach((u,i)=>{
+    const c=document.createElement('div'); c.className='unit-card';
+    c.innerHTML=`<div class="un">${u.unit===0?'Welcome':'Unit '+u.unit}</div><div class="ut">${u.emoji} ${u.label}</div><div class="uts">${u.topics}</div>`;
+    c.addEventListener('click',()=>showSpellLessons(i)); grid.appendChild(c);
+  });
+}
+function _renderSpellUnits_orig(){
+  const grid=$('sunit-grid'); grid.innerHTML='';
+  BOOK.forEach((u,i)=>{
+    const c=document.createElement('div'); c.className='unit-card';
+    c.innerHTML=`<div class="un">${u.unit===0?'Welcome':`Unit ${u.unit}`}</div><div class="ut">${u.emoji} ${u.label}</div><div class="uts">${u.topics}</div>`;
+    c.addEventListener('click',()=>showSpellLessons(i)); grid.appendChild(c);
+  });
+}
+function showSpellLessons(ui){
+  const u=BOOK[ui]; $('sv-units').style.display='none'; $('sv-lessons').style.display='block';
+  $('sunit-head').textContent=`${u.emoji} ${u.unit===0?'Welcome':`Unit ${u.unit}`}: ${u.label}`; $('sunit-sub').textContent=u.topics;
+  const list=$('slessons'); list.innerHTML='';
+  u.lessons.forEach((l,j)=>{
+    const item=document.createElement('div'); item.className='li';
+    item.innerHTML=`<span class="ltag">${l.tag}</span><div class="linfo"><div class="lname">${l.title}</div><div class="ldesc">${l.vocab.length} ta so'z</div></div><span style="color:var(--text3);font-size:18px;">›</span>`;
+    item.addEventListener('click',()=>startSpellGame(ui,j)); list.appendChild(item);
+  });
+}
+$('sback-units').addEventListener('click',()=>{ $('sv-lessons').style.display='none'; $('sv-units').style.display='block'; });
+$('sback-lessons').addEventListener('click',()=>{ $('sv-game').style.display='none'; $('sv-lessons').style.display='block'; });
+$('sback-score').addEventListener('click',()=>{ $('sv-score').style.display='none'; $('sv-units').style.display='block'; });
+$('sp-retry-btn').addEventListener('click',()=>{ if(SP.lessonRef) startSpellGame(SP.lessonRef.ui, SP.lessonRef.li); });
+
+function startSpellGame(ui,li){
+  const l=BOOK[ui].lessons[li]; SP.lessonRef={ui,li}; SP.words=[...l.vocab]; SP.idx=0; SP.score=0; SP.wrong=[]; SP.hints=0;
+  $('sv-lessons').style.display='none'; $('sv-score').style.display='none'; $('sv-game').style.display='flex'; renderSpellCard();
+}
+function renderSpellCard(){
+  if(SP.idx >= SP.words.length){ showSpellScore(); return; }
+  const w = SP.words[SP.idx]; const answer = w.en.toLowerCase(); const wrap = $('sp-wrap');
+  wrap.innerHTML = `
+    <div class="sp-emoji-box"><div class="sp-progress">${SP.idx+1} / ${SP.words.length}</div><span style="user-select:none;">${w.emoji||'📝'}</span></div>
+    <div class="sp-word-bar"><div class="sp-uz-word">${w.uz}</div><div class="sp-letters" id="sp-letters">
+      ${answer.split('').map((ch,i)=>ch===' ' ? `<div class="sp-box space"></div>` : `<div class="sp-box" id="spb-${i}"></div>`).join('')}
+    </div></div>`;
+  const inp = $('sp-input'); inp.value = ''; inp.focus(); $('sp-feedback').style.display='none'; $('sp-feedback').className='sp-feedback';
+}
+function checkSpelling(typed){
+  const w = SP.words[SP.idx]; const answer = w.en.toLowerCase(); const input = typed.toLowerCase().trim(); const fb = $('sp-feedback');
+  let letterIdx = 0; let allCorrect = true;
+  for(let i=0; i<answer.length; i++){
+    if(answer[i]===' ') continue; const box = $(`spb-${i}`); if(!box) continue;
+    const typedCh = (input.replace(/ /g,''))[letterIdx] || ''; box.textContent = typedCh || '';
+    if(typedCh === answer[i]){ box.className='sp-box correct'; } else { box.className='sp-box wrong'; allCorrect = false; } letterIdx++;
+  }
+  if(allCorrect && input.replace(/ /g,'') === answer.replace(/ /g,'')){
+    SP.score++; fb.className='sp-feedback correct'; fb.textContent = `✅ To'g'ri! "${w.en}"`; fb.style.display='block'; $('sp-input').disabled=true;
+    setTimeout(()=>{ $('sp-input').disabled=false; SP.idx++; renderSpellCard(); }, 1600);
+  } else {
+    SP.wrong.push({uz:w.uz, en:w.en, typed:input}); fb.className='sp-feedback wrong';
+    const cLetters = answer.split(''); const tLetters = input.split(''); let diff = '';
+    for(let i=0; i<Math.max(cLetters.length, tLetters.length); i++){
+      const c = cLetters[i]||''; const t = tLetters[i]||'_';
+      if(c===t) diff += `<span style="color:var(--green)">${c}</span>`; else diff += `<span style="color:var(--red)">${t||'_'}</span>`;
+    }
+    fb.innerHTML = `❌ Noto'g'ri: <span style="letter-spacing:3px;font-family:'Syne',sans-serif;">${diff}</span><br>✅ To'g'ri: <b style="letter-spacing:2px;">${w.en}</b>`;
+    fb.style.display='block'; $('sp-input').disabled=true;
+    setTimeout(()=>{ $('sp-input').disabled=false; $('sp-input').value=''; $('sp-input').focus(); SP.idx++; renderSpellCard(); }, 2600);
+  }
+}
+$('sp-input').addEventListener('keydown',e=>{ if(e.key==='Enter'){ const val=$('sp-input').value.trim(); if(val) checkSpelling(val); } });
+$('sp-hint-btn').addEventListener('click',()=>{
+  const w=SP.words[SP.idx]; if(!w)return; SP.hints++; const answer=w.en.toLowerCase(); const inp=$('sp-input');
+  if(inp.value.length < answer.length){
+    inp.value = answer.slice(0, inp.value.length+1); const chars = inp.value.split(''); let li=0;
+    for(let i=0;i<answer.length;i++){
+      if(answer[i]===' ')continue; const box=$(`spb-${i}`); if(!box)continue;
+      if(li < chars.length){ box.textContent=chars[li]; box.className='sp-box hint'; } li++;
+    }
+    inp.focus();
+  }
+});
+$('sp-skip-btn').addEventListener('click',()=>{ const w=SP.words[SP.idx]; if(!w)return; SP.wrong.push({uz:w.uz, en:w.en, typed:'(o\'tkazib yuborildi)'}); SP.idx++; renderSpellCard(); });
+
+function showSpellScore(){
+  $('sv-game').style.display='none'; $('sv-score').style.display='block';
+  const total=SP.words.length; const pct=Math.round((SP.score/total)*100);
+  $('ss-num').textContent=SP.score; $('ss-total').textContent=`/ ${total} ta so'z`; $('ss-msg').textContent=scoreMsg(pct);
+  const wlist=$('ss-wrong-list'); wlist.innerHTML='';
+  if(SP.wrong.length>0){
+    const title=document.createElement('div'); title.style.cssText='font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;'; title.textContent='Xato so\'zlar:'; wlist.appendChild(title);
+    SP.wrong.forEach(w=>{
+      const row=document.createElement('div'); row.style.cssText='background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;';
+      row.innerHTML=`<span style="color:var(--text2);font-size:13px;">${w.uz}</span><span style="color:var(--red);font-size:13px;text-decoration:line-through;">${w.typed}</span><span style="color:var(--green);font-size:14px;font-weight:700;">${w.en}</span>`; wlist.appendChild(row);
+    });
+  }
+}
+
+renderSpellUnits();
+
+</script>
+</body>
+</html>
