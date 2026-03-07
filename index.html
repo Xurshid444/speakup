@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpeakUp — Navigate A1</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+  <div class="sw">
+    <div class="logo">🎙 SpeakUp</div>
+    <div class="tagline">Navigate A1 bilan inglizcha gaplashni o'rgan</div>
+    <div class="card">
+      <h2>Xush kelibsiz! 👋</h2>
+      <p>AI ustoz bilan inglizcha gaplashing, so'zlarni o'rganing va mashq qiling. Boshlash uchun hech narsa talab qilinmaydi — faqat bir tugma!</p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin:16px 0 4px;">
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="font-size:20px;">📚</span> Navigate A1 darslari bilan o'rgan</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="font-size:20px;">🎤</span> AI ustoz bilan ovozli suhbat</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="font-size:20px;">✍️</span> Spelling, Vocabulary, Grammar mashqlari</div>
+      </div>
+      <button class="btn btn-g" id="start-btn" style="margin-top:18px;">▶ Boshlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- GROQ KEY MODAL -->
+<div id="key-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:9998;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:24px;padding:28px;max-width:440px;width:100%;">
+    <div style="font-family:'Inter',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">🔑 Groq API Key kerak</div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:18px;">
+      AI bilan suhbat qilish uchun bepul Groq API key kiriting.<br>
+      Key olish: <a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent);">console.groq.com/keys</a> → "Create API Key"
+    </p>
+    <label class="lbl">Groq API Key</label>
+    <input class="inp" type="password" id="api-inp" placeholder="gsk_..." autocomplete="off" style="margin-bottom:14px;"/>
+    <button class="btn btn-g" id="key-modal-save" style="margin-top:0;">✓ Saqlash va davom etish</button>
+    <button onclick="closeKeyModal()" style="width:100%;margin-top:8px;padding:10px;background:transparent;border:none;color:var(--text3);font-size:13px;cursor:pointer;">Bekor qilish</button>
+  </div>
+</div>
+
+<div id="app-screen" class="screen" style="flex-direction:column;">
+  <div class="app-bar">
+    <div class="app-logo" id="home-logo-btn" style="cursor:pointer;" title="Bosh sahifa">🎙 SpeakUp</div>
+    <div class="hright">
+      <div class="badge" id="lvl-badge">A1</div>
+      <button id="theme-toggle-btn" class="icon-btn" title="Mavzu o'zgartirish" style="background:var(--s2);border:1px solid var(--border);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;">
+        <svg id="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button id="logout-btn" class="icon-btn" title="Chiqish" style="background:var(--s2);border:1px solid var(--border);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="tabs-wrap"><div class="tabs">
+    <button class="tab" data-tab="home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg> Bosh sahifa</button>
+    <button class="tab on" data-tab="book"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Navigate A1</button>
+    <button class="tab" data-tab="vocab"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg> Vocabulary</button>
+    <button class="tab" data-tab="spelling"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Spelling</button>
+    <button class="tab" data-tab="mcq"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Fill MCQ</button>
+    <button class="tab" data-tab="filltype"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10h8"/><path d="M8 14h4"/></svg> Fill Type</button>
+    <button class="tab" data-tab="wordorder"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="9" x2="15" y2="9"/><line x1="3" y1="15" x2="9" y2="15"/><path d="M17 12l4-3-4-3"/><path d="M21 15l-4 3 4 3" opacity=".5"/></svg> Word Order</button>
+    <button class="tab" data-tab="free"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Erkin suhbat</button>
+    <button class="tab" data-tab="mydict"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Lug'atim</button>
+    <button class="tab" data-tab="settings"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Sozlamalar</button>
+  </div></div>
+  <div class="app-body">
+
+    <div id="home-panel" class="panel on">
+      <div class="home-hero">
+        <div class="home-hero-badge">🎙 AI bilan ingliz tili</div>
+        <h1>Inglizchani<br>AI bilan o'rgan</h1>
+        <p>Navigate A1 darslari, AI ustoz, vocabulary, spelling va boshqa mashqlar — hammasi bir joyda.</p>
+
+      </div>
+      <div class="home-stats">
+        <div class="home-stat"><div class="hs-icon">🔥</div><div class="hs-val" id="hs-tokens">0</div><div class="hs-lbl">Bugungi tokenlar</div></div>
+        <div class="home-stat"><div class="hs-icon">📚</div><div class="hs-val" id="hs-units">11</div><div class="hs-lbl">Unitlar</div></div>
+        <div class="home-stat"><div class="hs-icon">🎯</div><div class="hs-val" id="hs-level">A1</div><div class="hs-lbl">Daraja</div></div>
+      </div>
+
+      <div class="home-section-title">Mashqlar</div>
+      <div class="home-cards">
+        <div class="home-card" onclick="switchTab('book');bnSet('book')">
+          <div class="hc-top"><div class="hc-icon-wrap">📚</div><span class="hc-badge ai">AI</span></div>
+          <div class="hc-body"><div class="hc-title">Navigate A1</div><div class="hc-desc">AI ustoz bilan mavzu bo'yicha suhbat</div></div>
+          <div class="hc-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9,18 15,12 9,6"/></svg></div>
+        </div>
+        <div class="home-card" onclick="switchTab('free');bnSet('free')">
+          <div class="hc-top"><div class="hc-icon-wrap">💬</div><span class="hc-badge ai">AI</span></div>
+          <div class="hc-body"><div class="hc-title">Erkin suhbat</div><div class="hc-desc">Istalgan mavzuda AI bilan gaplash</div></div>
+          <div class="hc-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9,18 15,12 9,6"/></svg></div>
+        </div>
+        <div class="home-card" onclick="switchTab('vocab');bnSet('vocab')">
+          <div class="hc-top"><div class="hc-icon-wrap">📝</div><span class="hc-badge practice">Mashq</span></div>
+          <div class="hc-body"><div class="hc-title">Vocabulary</div><div class="hc-desc">So'zlarni ovoz bilan tekshir</div></div>
+          <div class="hc-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9,18 15,12 9,6"/></svg></div>
+        </div>
+        <div class="home-card" onclick="switchTab('spelling');bnSet('spelling')">
+          <div class="hc-top"><div class="hc-icon-wrap">✍️</div><span class="hc-badge practice">Mashq</span></div>
+          <div class="hc-body"><div class="hc-title">Spelling</div><div class="hc-desc">So'zlarni to'g'ri yozishni o'rgan</div></div>
+          <div class="hc-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9,18 15,12 9,6"/></svg></div>
+        </div>
+        <div class="home-card" onclick="switchTab('mcq');bnSet('mcq')">
+          <div class="hc-top"><div class="hc-icon-wrap">🔤</div><span class="hc-badge practice">Mashq</span></div>
+          <div class="hc-body"><div class="hc-title">Fill MCQ</div><div class="hc-desc">4 variantdan to'g'risini tanlang</div></div>
+          <div class="hc-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9,18 15,12 9,6"/></svg></div>
+        </div>
+        <div class="home-card" onclick="switchTab('wordorder');bnSet('wordorder')">
+          <div class="hc-top"><div class="hc-icon-wrap">🔀</div><span class="hc-badge practice">Mashq</span></div>
+          <div class="hc-body"><div class="hc-title">Word Order</div><div class="hc-desc">So'zlarni to'g'ri tartibga keltir</div></div>
+          <div class="hc-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9,18 15,12 9,6"/></svg></div>
+        </div>
+      </div>
+        <div class="home-card" onclick="switchTab('mydict');bnSet('mydict')">
+          <div class="hc-top"><div class="hc-icon-wrap">⭐</div><span class="hc-badge" style="background:rgba(180,142,255,.12);border:1px solid rgba(180,142,255,.25);color:var(--purple);">Shaxsiy</span></div>
+          <div class="hc-body"><div class="hc-title">Mening lug'atim</div><div class="hc-desc">O'z so'zlaringizni yuklang va mashq qiling</div></div>
+          <div class="hc-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9,18 15,12 9,6"/></svg></div>
+        </div>
+    </div>
+
+    <div id="book-panel" class="panel">
+      <div id="bv-units" style="display:block;">
+        <div class="book-header">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;">Navigate Beginner A1</div>
+          <h2 style="font-size:26px;margin-bottom:6px;">📖 Darslarni boshlang</h2>
+          <p>Unit tanlang — AI ustoz o'sha mavzu bo'yicha suhbat quradi va xatolaringizni tuzatadi.</p>
+        </div>
+        <div class="unit-grid" id="unit-grid"></div>
+      </div>
+      <div id="bv-lessons" style="display:none;">
+        <div class="back-btn" id="back-units"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Unitlarga qaytish</div>
+        <div class="ph"><h2 id="bunit-head"></h2><p id="bunit-sub"></p></div>
+        <div class="lesson-list" id="blessons"></div>
+      </div>
+      <div id="bv-chat" style="display:none;">
+        <div class="back-btn" id="back-lessons"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Darslarga qaytish</div>
+        <div style="background:linear-gradient(120deg,var(--s2) 0%,var(--s1) 100%);border:1px solid var(--border);border-radius:20px;padding:16px 20px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.2);">
+          <div id="cl-tag" style="font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--purple);text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:5px;"></div>
+          <div id="cl-title" style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;margin-bottom:3px;"></div>
+          <div id="cl-vocab" style="font-size:12px;color:var(--text2);line-height:1.6;"></div>
+        </div>
+        <div class="chat-area" id="book-chat"></div>
+        <div class="mic-area">
+          <div class="mic-status" id="tb-book">Bosib gapiring...</div>
+          <div class="wave" id="wv-book"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="mic-ctrl">
+            <div id="bi" class="rrow"><button class="rec-btn" id="brec"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></button></div>
+            <div id="br" class="rrow" style="display:none;"><button class="stop-btn" id="bstop"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></button><div class="rec-lbl"><span class="rdot"></span>Yozilmoqda</div></div>
+            <div id="bv" class="rev-row" style="display:none;"><button class="del-btn" id="bdel">✕ O'chirish</button><button class="snd-btn" id="bsnd">↑ Yuborish</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="vocab-panel" class="panel">
+      <div id="vv-units" style="display:block;">
+        <div class="ph"><h2>📝 Vocabulary Test</h2><p>Unit tanlang — so'zlarni qancha yaxshi bilishingizni tekshiramiz.</p></div>
+        <div class="unit-grid" id="vunit-grid"></div>
+      </div>
+      <div id="vv-lessons" style="display:none;">
+        <div class="back-btn" id="vback-units"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Unitlarga qaytish</div>
+        <div class="ph"><h2 id="vunit-head"></h2><p id="vunit-sub"></p></div>
+        <div class="lesson-list" id="vlessons"></div>
+      </div>
+      <div id="vv-test" style="display:none;">
+        <div class="back-btn" id="vback-lessons"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Darslarga qaytish</div>
+        <div class="voc-lesson-hdr" style="margin-bottom:14px;"><span class="ltag" id="vtest-tag" style="margin-bottom:8px;display:inline-block;"></span><h3 id="vtest-title" style="font-size:18px;font-weight:800;color:var(--text);"></h3></div>
+        <div class="voc-mode-bar">
+          <div class="mode-seg" id="mode-seg"><button class="on" data-mode="uz-en">🇺🇿 O'zbek → 🇬🇧 Ingliz</button><button data-mode="en-uz">🇬🇧 Ingliz → 🇺🇿 O'zbek</button></div>
+        </div>
+        <div id="vtest-area" class="vcard-wrap"></div>
+      </div>
+      <div id="vv-score" style="display:none;">
+        <div class="back-btn" id="vback-test">← Qaytish</div>
+        <div class="score-card">
+          <div class="score-num" id="sc-num">0</div><div class="score-total" id="sc-total">/ 0 ta so'z</div><div class="score-msg" id="sc-msg"></div>
+          <button class="btn btn-g" id="retry-btn" style="width:auto;margin:0 auto;display:flex;">🔄 Qaytadan</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="spelling-panel" class="panel">
+      <div id="sv-units" style="display:block;">
+        <div class="ph"><h2>✍️ Spelling Test</h2><p>Unit tanlang — o'zbekcha so'zni ko'rasiz va inglizcha yozilishini terasiz.</p></div>
+        <div class="unit-grid" id="sunit-grid"></div>
+      </div>
+      <div id="sv-lessons" style="display:none;">
+        <div class="back-btn" id="sback-units"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Unitlarga qaytish</div>
+        <div class="ph"><h2 id="sunit-head"></h2><p id="sunit-sub"></p></div>
+        <div class="lesson-list" id="slessons"></div>
+      </div>
+      <div id="sv-game" style="display:none;">
+        <div class="back-btn" id="sback-lessons"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Darslarga qaytish</div>
+        <div style="position:relative;width:100%;display:flex;flex-direction:column;align-items:center;" onclick="document.getElementById('sp-input').focus()">
+          <div class="sp-wrap" id="sp-wrap"></div>
+          <input class="sp-input" id="sp-input" placeholder="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text"/>
+        </div>
+        <div class="sp-feedback" id="sp-feedback"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <button class="sp-hint-btn" id="sp-hint-btn">💡 Maslahat</button><button class="btn btn-s btn-sm" id="sp-skip-btn">⏭ O'tkazib yuborish</button>
+        </div>
+      </div>
+      <div id="sv-score" style="display:none;">
+        <div class="back-btn" id="sback-score"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Unitlarga qaytish</div>
+        <div class="score-card">
+          <div class="score-num" id="ss-num">0</div><div class="score-total" id="ss-total">/ 0 ta so'z</div><div class="score-msg" id="ss-msg"></div>
+          <div id="ss-wrong-list" style="margin:16px 0;text-align:left;display:flex;flex-direction:column;gap:6px;"></div>
+          <button class="btn btn-g" id="sp-retry-btn" style="width:auto;margin:0 auto;display:flex;">🔄 Qaytadan</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="mcq-panel" class="panel">
+      <div id="mcq-units" style="display:block;width:100%;overflow:visible;"><div class="ph"><h2>🔤 Fill in the Blank</h2><p>Gapning tushirib qoldirilgan so'zini 4 ta variantdan tanlang.</p></div><div class="unit-grid" id="mcq-unit-grid"></div></div>
+      <div id="mcq-lessons" style="display:none;"><div class="back-btn" id="mcq-back-units"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Unitlarga qaytish</div><div class="ph"><h2 id="mcq-unit-head"></h2><p id="mcq-unit-sub"></p></div><div class="lesson-list" id="mcq-lesson-list"></div></div>
+      <div id="mcq-game" style="display:none;">
+        <div class="back-btn" id="mcq-back-lessons"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Darslarga qaytish</div>
+        <div class="ex-top"><span style="font-size:13px;color:var(--text2)" id="mcq-prog-txt"></span><span id="mcq-score-txt" style="font-size:13px;font-weight:700;color:var(--accent)"></span></div>
+        <div class="ex-progress-bar"><div class="ex-progress-fill" id="mcq-prog-fill" style="width:0%"></div></div>
+        <div class="ex-card"><div class="ex-sentence" id="mcq-sentence"></div><div class="opts-grid" id="mcq-opts"></div><div class="ex-feedback" id="mcq-feedback" style="display:none;"></div></div>
+      </div>
+      <div id="mcq-score" style="display:none;"><div class="back-btn" id="mcq-score-back"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Unitlarga qaytish</div><div class="score-card"><div class="score-num" id="mcq-sc-num">0</div><div class="score-total" id="mcq-sc-total"></div><div class="score-msg" id="mcq-sc-msg"></div><button class="btn btn-g" id="mcq-retry" style="width:auto;margin:0 auto;display:flex;">🔄 Qaytadan</button></div></div>
+    </div>
+
+    <div id="filltype-panel" class="panel">
+      <div id="ft-units" style="display:block;width:100%;overflow:visible;"><div class="ph"><h2>⌨️ Fill in the Blank</h2><p>Gapning tushirib qoldirilgan so'zini o'zingiz yozing.</p></div><div class="unit-grid" id="ft-unit-grid"></div></div>
+      <div id="ft-lessons" style="display:none;"><div class="back-btn" id="ft-back-units"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Unitlarga qaytish</div><div class="ph"><h2 id="ft-unit-head"></h2><p id="ft-unit-sub"></p></div><div class="lesson-list" id="ft-lesson-list"></div></div>
+      <div id="ft-game" style="display:none;">
+        <div class="back-btn" id="ft-back-lessons"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Darslarga qaytish</div>
+        <div class="ex-top"><span style="font-size:13px;color:var(--text2)" id="ft-prog-txt"></span><span id="ft-score-txt" style="font-size:13px;font-weight:700;color:var(--accent)"></span></div>
+        <div class="ex-progress-bar"><div class="ex-progress-fill" id="ft-prog-fill" style="width:0%"></div></div>
+        <div class="ex-card"><div class="ex-sentence" id="ft-sentence"></div><input class="fill-input" id="ft-input" placeholder="yozing..." autocomplete="off" autocorrect="off" spellcheck="false"/><div class="ex-feedback" id="ft-feedback" style="display:none;"></div></div>
+      </div>
+      <div id="ft-score" style="display:none;"><div class="back-btn" id="ft-score-back"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Unitlarga qaytish</div><div class="score-card"><div class="score-num" id="ft-sc-num">0</div><div class="score-total" id="ft-sc-total"></div><div class="score-msg" id="ft-sc-msg"></div><button class="btn btn-g" id="ft-retry" style="width:auto;margin:0 auto;display:flex;">🔄 Qaytadan</button></div></div>
+    </div>
+
+    <div id="wordorder-panel" class="panel">
+      <div id="wo-units" style="display:block;width:100%;overflow:visible;"><div class="ph"><h2>🔀 Word Order</h2><p>So'zlarni sudrab to'g'ri tartibga keltirib, to'g'ri gap tuzing.</p></div><div class="unit-grid" id="wo-unit-grid"></div></div>
+      <div id="wo-lessons" style="display:none;"><div class="back-btn" id="wo-back-units"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Unitlarga qaytish</div><div class="ph"><h2 id="wo-unit-head"></h2><p id="wo-unit-sub"></p></div><div class="lesson-list" id="wo-lesson-list"></div></div>
+      <div id="wo-game" style="display:none;">
+        <div class="back-btn" id="wo-back-lessons"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Darslarga qaytish</div>
+        <div class="ex-top"><span style="font-size:13px;color:var(--text2)" id="wo-prog-txt"></span><span style="font-size:12px;color:var(--text3)">So'zlarni to'g'ri tartibga keltiring</span></div>
+        <div class="ex-progress-bar"><div class="ex-progress-fill" id="wo-prog-fill" style="width:0%"></div></div>
+        <div style="width:100%;max-width:520px;display:flex;flex-direction:column;gap:10px;">
+          <div class="wo-labels"><span>📝 To'g'ri gap:</span><span></span></div><div class="wo-sentence" id="wo-answer-area"></div>
+          <div class="wo-labels"><span>📦 So'zlar:</span><span></span></div><div class="word-pool" id="wo-pool"></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <button class="btn btn-s btn-sm" id="wo-clear-btn">🔄 Tozalash</button><button class="wo-check-btn" id="wo-check-btn">✓ Tekshirish</button>
+        </div>
+        <div class="wo-feedback" id="wo-feedback" style="display:none;"></div>
+      </div>
+      <div id="wo-done" style="display:none;"><div class="back-btn" id="wo-done-back"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Unitlarga qaytish</div><div class="score-card"><div style="font-size:52px;margin-bottom:8px;">🏆</div><div style="font-family:'Inter',sans-serif;font-size:24px;font-weight:800;margin-bottom:8px;">Barakalla!</div><div id="wo-done-msg" style="color:var(--text2);margin-bottom:20px;"></div><button class="btn btn-g" id="wo-retry" style="width:auto;margin:0 auto;display:flex;">🔄 Qaytadan</button></div></div>
+    </div>
+
+    <div id="free-panel" class="panel">
+      <div class="chat-area" id="free-chat">
+        <div id="free-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;gap:8px;padding:40px;">
+          <div style="font-size:42px;">💬</div><div style="font-family:'Inter',sans-serif;font-size:20px;font-weight:700;">Erkin suhbat</div>
+          <div style="color:var(--text2);font-size:13px;max-width:280px;line-height:1.6;">Istalgan mavzuda inglizcha gaplashing. AI xatolaringizni tuzatib boradi.</div>
+          <button class="btn btn-g" id="free-start-btn" style="width:auto;margin-top:8px;padding:10px 22px;">Boshlash →</button>
+        </div>
+      </div>
+      <div class="mic-area">
+        <div class="mic-status" id="tb-free">Bosib gapiring...</div>
+        <div class="wave" id="wv-free"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="mic-ctrl">
+          <div id="fi" class="rrow"><button class="rec-btn" id="frec"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg></button></div>
+          <div id="fr" class="rrow" style="display:none;"><button class="stop-btn" id="fstop"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></button><div class="rec-lbl"><span class="rdot"></span>Yozilmoqda</div></div>
+          <div id="fv" class="rev-row" style="display:none;"><button class="del-btn" id="fdel">✕ O'chirish</button><button class="snd-btn" id="fsnd">↑ Yuborish</button></div>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="mydict-panel" class="panel">
+
+      <!-- 1. PAKETLAR RO'YXATI -->
+      <div id="myd-home">
+        <div class="myd-header">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--purple);text-transform:uppercase;margin-bottom:6px;">Shaxsiy lug'at</div>
+          <h2>⭐ Mening lug'atim</h2>
+          <p>Fayl yuklang — har 20 ta so'z alohida paket bo'lib saqlanadi</p>
+        </div>
+
+        <!-- YUKLASH -->
+        <div class="myd-upload-area" id="myd-drop" onclick="document.getElementById('myd-file').click()">
+          <div class="myd-icon" id="myd-upload-icon">📂</div>
+          <h3 id="myd-upload-title">Fayl tanlang yoki bu yerga tashlang</h3>
+          <p id="myd-upload-sub">.txt yoki .csv &nbsp;·&nbsp; ajratuvchi: <code>apple,olma</code> yoki <code>apple/olma</code></p>
+          <div id="myd-progress-wrap" style="display:none;width:100%;margin-top:12px;">
+            <div style="height:6px;background:var(--s3);border-radius:6px;overflow:hidden;">
+              <div id="myd-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--purple),#8b5cf6);border-radius:6px;transition:width .2s;"></div>
+            </div>
+            <div id="myd-progress-txt" style="font-size:12px;color:var(--text2);margin-top:6px;text-align:center;">0%</div>
+          </div>
+        </div>
+        <input type="file" id="myd-file" accept=".txt,.csv" style="display:none">
+
+        <!-- MANUAL KIRITISH -->
+        <div class="myd-add-section">
+          <div class="myd-add-label">✏️ Qo'lda so'z qo'shish</div>
+          <div class="myd-add-row">
+            <input class="myd-add-inp" id="myd-en-inp" placeholder="🇺🇸 English" autocorrect="off" spellcheck="false" autocapitalize="off">
+            <input class="myd-add-inp" id="myd-uz-inp" placeholder="🇺🇿 O'zbekcha">
+          </div>
+          <button class="myd-add-btn-full" id="myd-add-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            So'z qo'shish
+          </button>
+        </div>
+
+        <!-- FORMAT -->
+        <div class="myd-format">
+          <span style="font-size:16px;flex-shrink:0;">📄</span>
+          <span>Fayl formati: <code>apple,olma</code> yoki <code>apple/olma</code> — har qatorda bir so'z. Har 20 ta so'z bitta paket bo'lib saqlanadi.</span>
+        </div>
+
+        <!-- PAKETLAR -->
+        <div id="myd-packets-wrap">
+          <div class="myd-packets-header">
+            <span class="myd-packets-title">📦 Paketlar</span>
+          </div>
+          <div class="myd-empty" id="myd-empty">
+            <div class="myd-empty-icon">📦</div>
+            <div>Hali paket yo'q.<br>Fayl yuklang yoki so'z qo'shing</div>
+          </div>
+          <div id="myd-packets-list"></div>
+        </div>
+      </div>
+
+      <!-- 2. O'YIN -->
+      <div id="myd-game" style="display:none;" onclick="document.getElementById('myd-sp-input').focus()">
+
+        <!-- TOP NAV -->
+        <div class="myd-game-nav">
+          <button class="back-btn" id="myd-back-btn" onclick="event.stopPropagation()">← Qaytish</button>
+          <div class="myd-game-counter" id="myd-prog-txt">1 / 20</div>
+        </div>
+
+        <!-- PROGRESS -->
+        <div class="myd-prog-track">
+          <div class="myd-prog-fill" id="myd-prog-fill" style="width:0%"></div>
+        </div>
+
+        <!-- KARTA -->
+        <div class="myd-card" id="myd-card">
+          <div class="myd-card-inner" id="myd-sp-wrap"></div>
+        </div>
+
+        <!-- FEEDBACK -->
+        <div class="myd-feedback-wrap">
+          <div class="sp-feedback" id="myd-sp-feedback"></div>
+        </div>
+
+        <!-- INPUT (yashirin) -->
+        <input class="sp-input" id="myd-sp-input" placeholder="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text"/>
+
+        <!-- TUGMALAR -->
+        <div class="myd-actions-bar">
+          <button class="myd-btn-hint" id="myd-hint-btn" onclick="event.stopPropagation()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Maslahat
+          </button>
+          <button class="myd-btn-check" id="myd-check-btn" onclick="event.stopPropagation();mydCheck()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Tekshirish
+          </button>
+          <button class="myd-btn-skip" id="myd-skip-btn" onclick="event.stopPropagation()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+            O'tkazish
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 3. NATIJA -->
+      <div id="myd-score" style="display:none;">
+        <div class="back-btn" id="myd-score-back">← Paketlarga qaytish</div>
+        <div class="score-card">
+          <div class="score-num" id="myd-sc-num">0</div>
+          <div class="score-total" id="myd-sc-total"></div>
+          <div class="score-msg" id="myd-sc-msg"></div>
+          <div id="myd-wrong-list" style="margin:16px 0;text-align:left;display:flex;flex-direction:column;gap:6px;"></div>
+          <button class="btn btn-g" id="myd-retry-btn" style="width:auto;margin:0 auto;display:flex;">🔄 Qaytadan</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="settings-panel" class="panel">
+      <div class="scard">
+        <h4>🎨 Ko'rinish</h4>
+        <div class="seg" id="theme-seg"><button class="on" data-v="dark">🌙 Dark</button><button data-v="light">☀️ Light</button></div>
+        <label class="lbl mt">Shirift kattaligi</label>
+        <div class="seg" id="font-seg">
+          <button data-v="14">A <span style="font-size:10px">kichik</span></button>
+          <button class="on" data-v="16">A <span style="font-size:10px">o'rta</span></button>
+          <button data-v="18">A <span style="font-size:10px">katta</span></button>
+          <button data-v="20">A <span style="font-size:10px">juda katta</span></button>
+        </div>
+      </div>
+      <div class="scard">
+        <h4>📚 O'qish sozlamalari</h4>
+        <label class="lbl">Daraja</label>
+        <select class="sel" id="lvl-app"><option value="A1" selected>A1 — Boshlang'ich</option><option value="A2">A2 — O'rta past</option><option value="B1">B1 — O'rta</option></select>
+        <label class="lbl mt">Tuzatish tili</label>
+        <div class="seg" id="lang-app"><button class="on" data-v="uz">🇺🇿 O'zbekcha</button><button data-v="en">🇺🇸 Inglizcha</button></div>
+        <label class="lbl mt">Aksent</label>
+        <div class="seg" id="acc-app"><button data-v="en-US">🇺🇸 American</button><button class="on" data-v="en-GB">🇬🇧 British</button></div>
+      </div>
+      <div class="scard">
+        <h4>⏱ Ovoz tezligi — <span id="spd-disp">1.0x</span></h4>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:6px;">
+          <span style="font-size:11px;color:var(--text3)">Sekin</span><input type="range" id="spd-app" min="0.5" max="2" step="0.1" value="1" style="flex:1;"><span style="font-size:11px;color:var(--text3)">Tez</span>
+        </div>
+      </div>
+      <div class="scard">
+        <h4>🎙 ElevenLabs TTS <span class="optional-badge">IXTIYORIY</span></h4>
+        <label class="lbl">API Key</label>
+        <div style="display:flex;gap:8px;margin-bottom:10px;"><input class="inp" type="password" id="el-app" placeholder="sk_..." style="flex:1;"/><button class="btn btn-s btn-sm" id="save-el-btn">💾</button></div>
+        <label class="lbl">Ovoz</label>
+        <div style="display:flex;gap:8px;margin-bottom:10px;"><select class="sel" id="el-voice-sel" style="flex:1;"><option value="">— Avval key kiriting —</option></select><button class="btn btn-s btn-sm" id="el-load-btn" title="Ovozlarni yuklash">🔄</button></div>
+        <button class="btn btn-s btn-sm" id="test-el-btn" style="width:100%;margin-bottom:8px;">▶ Sinash</button>
+        <div id="el-limit-wrap" style="display:none;margin-top:6px;"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px;"><span>Oylik limit</span><span id="el-limit-txt"></span></div><div style="height:5px;background:var(--s2);border-radius:3px;overflow:hidden;"><div id="el-limit-fill" style="height:100%;border-radius:3px;transition:width .4s;"></div></div></div>
+        <p id="el-status" style="margin-top:8px;font-size:12px;color:var(--text3);">Key kiritilmagan — brauzer TTS ishlatilmoqda.</p>
+      </div>
+      <div class="scard">
+        <h4>🔊 Brauzer ovozi <span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;">(zaxira)</span></h4>
+        <select class="sel" id="voice-picker"></select><button class="btn btn-s btn-sm" id="test-br-btn" style="width:100%;margin-top:8px;">▶ Sinash</button>
+      </div>
+      <div class="scard">
+        <h4>🔑 Groq API Key</h4>
+        <div style="display:flex;gap:8px;"><input class="inp" type="password" id="api-app" placeholder="gsk_..." style="flex:1;"/><button class="btn btn-s btn-sm" id="save-api-btn">💾</button></div>
+        <div class="usage-grid" id="groq-usage-wrap">
+          <div class="usage-box">
+            <div class="ub-lbl">Bugungi tokenlar</div>
+            <div class="ub-val" id="groq-day-val">0</div>
+            <div class="ub-sub">/ <span id="groq-day-limit-lbl">0</span> limit</div>
+            <div class="usage-bar-wrap"><div class="usage-bar" id="groq-day-bar" style="width:0%;background:var(--accent);"></div></div>
+          </div>
+          <div class="usage-box">
+            <div class="ub-lbl">Oylik tokenlar</div>
+            <div class="ub-val" id="groq-mon-val">0</div>
+            <div class="ub-sub">/ <span id="groq-mon-limit-lbl">0</span> limit</div>
+            <div class="usage-bar-wrap"><div class="usage-bar" id="groq-mon-bar" style="width:0%;background:var(--blue);"></div></div>
+          </div>
+        </div>
+        <div class="groq-limit-cfg">
+          <label>Kunlik limit:</label>
+          <input class="inp" type="number" id="groq-day-limit-inp" placeholder="14400" min="1000" style="width:90px;padding:6px 10px;font-size:12px;">
+          <label>Oylik limit:</label>
+          <input class="inp" type="number" id="groq-mon-limit-inp" placeholder="500000" min="10000" style="width:90px;padding:6px 10px;font-size:12px;">
+          <button class="btn btn-s btn-sm" id="groq-limit-save-btn">💾</button>
+        </div>
+        <div class="usage-reset" id="groq-rate-info">So'nggi so'rov: —</div>
+      </div>
+    </div>
+  </div>
+  <div class="status-bar"><div class="sdot"></div><span id="status-txt">Tayyor</span><span style="margin-left:auto;color:var(--text3)" id="tts-indicator">🔊 Brauzer TTS</span></div>
+</div>
+
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="bottom-nav" id="bottom-nav">
+  <button class="bn-item on" data-tab="home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+    <span>Bosh</span>
+  </button>
+  <button class="bn-item" data-tab="book">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <span>Navigate</span>
+  </button>
+  <button class="bn-item" data-tab="vocab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>Vocab</span>
+  </button>
+  <button class="bn-item" data-tab="spelling">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    <span>Spelling</span>
+  </button>
+  <button class="bn-item" data-tab="more">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+    <span>Ko'proq</span>
+  </button>
+</div>
+
+<!-- MORE MENU -->
+<div id="more-menu" style="display:none;position:fixed;bottom:72px;left:12px;right:12px;background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:12px;z-index:201;flex-wrap:wrap;gap:8px;">
+  <button class="bn-more-item" data-tab="mcq" onclick="switchTab('mcq');bnSet('mcq');closeMore()">🔤 Fill MCQ</button>
+  <button class="bn-more-item" data-tab="filltype" onclick="switchTab('filltype');bnSet('filltype');closeMore()">⌨️ Fill Type</button>
+  <button class="bn-more-item" data-tab="wordorder" onclick="switchTab('wordorder');bnSet('wordorder');closeMore()">🔀 Word Order</button>
+  <button class="bn-more-item" data-tab="free" onclick="switchTab('free');bnSet('free');closeMore()">💬 Erkin suhbat</button>
+  <button class="bn-more-item" data-tab="mydict" onclick="switchTab('mydict');bnSet('mydict');closeMore()">⭐ Lug'atim</button>
+  <button class="bn-more-item" data-tab="settings" onclick="switchTab('settings');bnSet('settings');closeMore()">⚙️ Sozlamalar</button>
+</div>
+
+<!-- MY DICT EDIT MODAL -->
+<div id="myd-edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:9999;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)mydCloseEdit()">
+  <div class="myd-edit-box">
+    <div class="myd-edit-title">
+      <span>✏️ Paketni tahrirlash</span>
+      <button onclick="mydCloseEdit()" style="background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;line-height:1;padding:0;">✕</button>
+    </div>
+    <div class="myd-edit-list" id="myd-edit-list"></div>
+    <button class="btn btn-g" onclick="mydSaveEdit()" style="width:100%;">✅ Saqlash</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- SCRIPTS — tartib muhim! -->
+<script src="data.js"></script>
+<script src="state.js"></script>
+<script src="book.js"></script>
+<script src="vocab.js"></script>
+<script src="spelling.js"></script>
+<script src="exercises.js"></script>
+<script src="mydict.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
