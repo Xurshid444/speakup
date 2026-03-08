@@ -60,7 +60,13 @@ function renderFt(){
   const q=FT.items[FT.idx]; const total=FT.items.length;
   $('ft-prog-txt').textContent=`${FT.idx+1} / ${total}`; $('ft-score-txt').textContent=`✅ ${FT.score}`; $('ft-prog-fill').style.width=(FT.idx/total*100)+'%'; $('ft-feedback').style.display='none';
   const parts=q.s.split('___'); $('ft-sentence').innerHTML=parts.length===2?`${parts[0]}<span class="blank-spot">___</span>${parts[1]}`:q.s;
-  const inp=$('ft-input'); inp.value=''; inp.className='fill-input'; inp.disabled=false; setTimeout(()=>inp.focus(),100);
+  const inp=$('ft-input'); inp.value=''; inp.className='fill-input'; inp.disabled=false;
+  setTimeout(()=>{
+    inp.focus();
+    // Kursor o'rtaga — placeholder ko'rinayotganda setSelectionRange ishlamaydi
+    // Shuning uchun value bo'sh bo'lganda text-align:center caret ni o'rtaga qo'yadi
+    inp.setSelectionRange(0,0);
+  },100);
 }
 function checkFt(){
   if(FT.busy)return; const q=FT.items[FT.idx]; const val=$('ft-input').value.trim().toLowerCase(); if(!val)return; FT.busy=true;
