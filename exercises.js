@@ -65,35 +65,18 @@ function renderFt(){
 }
 function checkFt(){
   if(FT.busy)return; const q=FT.items[FT.idx]; const val=$('ft-input').value.trim().toLowerCase(); if(!val)return; FT.busy=true;
-  const fb=$('ft-feedback'); const inp=$('ft-input'); inp.disabled=true; const wrapD=document.getElementById('ft-wrap'); if(wrapD) wrapD.classList.remove('focused');
+  const fb=$('ft-feedback'); const inp=$('ft-input'); inp.disabled=true;
   if(val===q.a.toLowerCase()){
-    FT.score++;
-    const wrapC=document.getElementById('ft-wrap');
-    if(wrapC) wrapC.classList.add('correct'); fb.className='ex-feedback correct'; fb.textContent=`✅ To'g'ri! "${q.a}"`; fb.style.display='block';
+    FT.score++; inp.className='fill-input correct'; fb.className='ex-feedback correct'; fb.textContent=`✅ To'g'ri! "${q.a}"`; fb.style.display='block';
   }else{
-    const wrapW=document.getElementById('ft-wrap');
-    if(wrapW) wrapW.classList.add('wrong'); fb.className='ex-feedback wrong'; fb.textContent=`❌ Noto'g'ri. To'g'ri javob: "${q.a}"`; fb.style.display='block';
+    inp.className='fill-input wrong'; fb.className='ex-feedback wrong'; fb.textContent=`❌ Noto'g'ri. To'g'ri javob: "${q.a}"`; fb.style.display='block';
   }
   setTimeout(()=>{FT.idx++;FT.busy=false;renderFt();},1500);
 }
 $('ft-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkFt();});
-$('ft-input').addEventListener('input',e=>{
-  const val=e.target.value;
-  const disp=document.getElementById('ft-display');
-  const ph=document.getElementById('ft-placeholder');
-  const wrap=document.getElementById('ft-wrap');
-  if(disp) disp.textContent=val;
-  if(ph) ph.style.display=val?'none':'block';
-  if(wrap){ wrap.classList.toggle('has-text',!!val); wrap.classList.remove('correct','wrong'); }
-});
-$('ft-input').addEventListener('focus',()=>{
-  const wrap=document.getElementById('ft-wrap');
-  if(wrap) wrap.classList.add('focused');
-});
-$('ft-input').addEventListener('blur',()=>{
-  const wrap=document.getElementById('ft-wrap');
-  if(wrap) wrap.classList.remove('focused');
-});
+
+
+
 // Caret o'rtada turishi uchun: focus da scroll end ga o'tkazamiz
 (function(){
   const inp2 = $('ft-input');

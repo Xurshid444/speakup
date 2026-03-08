@@ -244,7 +244,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .sp-word-bar{width:100%;background:var(--s1);border:1px solid var(--border);border-top:none;padding:22px 16px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;border-radius:0 0 20px 20px;}
 .sp-uz-word{font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:var(--text);letter-spacing:.01em;text-align:center;margin-bottom:4px;}
 .sp-letters{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:6px;}
-.sp-box{width:46px;height:54px;border-radius:12px;background:var(--s3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;text-transform:lowercase;transition:border-color .15s,background .15s,color .15s;font-family:'Inter',sans-serif;color:var(--text);cursor:text;}
+.sp-box{width:46px;height:54px;border-radius:12px;background:var(--s3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;text-transform:lowercase;transition:border-color .15s,background .15s,color .15s;font-family:'Inter',sans-serif;color:var(--text);cursor:text;position:relative;overflow:visible;}
 .sp-box.space{width:16px;background:transparent;border:none;}
 
 .sp-box.correct{border-color:var(--green);background:rgba(74,222,128,.1);color:var(--green);animation:pop .25s ease;box-shadow:0 0 0 2px rgba(74,222,128,.2);}
@@ -274,8 +274,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .ex-progress-bar{width:100%;max-width:580px;height:5px;background:var(--s3);border-radius:3px;overflow:hidden;}
 .ex-progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--purple-light));border-radius:3px;transition:width .4s ease;}
 .ex-top{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:580px;}
-
-
 
 
 .wo-sentence{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;min-height:68px;width:100%;max-width:600px;background:rgba(108,60,225,.05);border:2px dashed rgba(108,60,225,.25);border-radius:20px;padding:14px 16px;align-content:center;transition:border-color .2s;}
@@ -662,7 +660,6 @@ input[type="text"], input:not([type]), textarea {
   }
 }
 
-
 /* ═══════════════════════════════════════════
    TILLI — YANGI KOMPONENTLAR
    ═══════════════════════════════════════════ */
@@ -692,8 +689,6 @@ input[type="text"], input:not([type]), textarea {
 /* ── SP-BOX cursor animatsiyasi ── */
 
   50%      { box-shadow: 0 0 0 4px rgba(108,60,225,.4); border-color: var(--purple-light); }
-
-
 
 /* ── MCQ variantlar — rangli ── */
 .opt-a { border-color: rgba(108,60,225,.35) !important; }
@@ -781,17 +776,11 @@ html { font-size: var(--fs-base, 24px); }
 /* ── Setup screen logo ── */
 .logo svg { filter: drop-shadow(0 4px 12px rgba(108,60,225,.3)); }
 
-
 /* ═══════════════════════════════════════════
    TUZATISHLAR — YANGI QISM
    ═══════════════════════════════════════════ */
 
-
-
 /* ── SP-CURSOR — katak ichida qimirlab turadigan kursor ── */
-
-
-
 
 
 /* ── MCQ opt ranglari kuchaytirish ── */
@@ -894,68 +883,26 @@ html { font-size: var(--fs-base, 24px); }
 
 
 
-
-
-
-
 /* Agar katak bo'sh bo'lsa kursor ko'rinsin, harf kiritilsa yo'qolsin */
-.sp-box.sp-cursor:not(:empty)::after {
-  display: none;
-}
 
 /* ── FILL TYPE — kursor o'rtada, qimirlab tursin ── */
 
-
 /* Caret animation — fill-input ichida */
-
-
-
-
 
 
 
 /* ── Fill Type input — kursor o'rtada ── */
 
 
-
-
 /* ═══════════════════════════════════════
    SP-BOX KURSOR — katak ichida | chiziq
    ═══════════════════════════════════════ */
 
-
-
 /* Active katak — border highlighted, qimirlamaydi */
-
 
 /* Kursor chiziq — faqat bo'sh active katakda */
 
-
 /* Harf kiritilganda kursor yo'qoladi */
-.sp-box.sp-cursor:not(:empty)::after {
-  display: none;
-
-
-/* ═══════════════════════════════════════
-   FILL TYPE — kursor o'rtada
-   ═══════════════════════════════════════ */
-
-
-
-
-
-
-
-
-
-/* ═══════════════════════════════════════════════
-   SP-BOX — KATAK STILI (qimirlamaydi)
-   ═══════════════════════════════════════════════ */
-.sp-box.active {
-  border-color: var(--purple);
-  background: var(--pdim);
-  box-shadow: 0 0 0 3px rgba(108,60,225,.12);
-}
 
 /* ── Katak ichida | kursor — faqat ::after qimirlaydi ── */
 @keyframes bar-blink {
@@ -995,17 +942,12 @@ html { font-size: var(--fs-base, 24px); }
 }
 
 
-
-
-
 @media (max-width:600px) {
   
 }
 
-}
+
 /* ── Fill input wrapper — caret o'rtada ── */
-
-
 
 .fill-fake-placeholder {
   position: absolute;
@@ -1022,88 +964,59 @@ html { font-size: var(--fs-base, 24px); }
 /* ════════════════════════════════════════
    FILL TYPE — Fake Input (kursor o'rtada)
    ════════════════════════════════════════ */
-.fill-real-input {
-  position: absolute;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  top: 0; left: 0;
-  cursor: text;
-  caret-color: transparent;
-  z-index: 2;
-}
 
-.fill-input-wrap {
-  position: relative;
+
+
+
+
+
+
+
+
+/* Ko'rinadigan matn */
+
+
+/* Placeholder */
+
+
+/* Kursor — 
+  50%, 100% { opacity: 0; }
+
+
+
+
+/* Matn bor bo'lganda ham kursor ko'rinsin */
+
+
+/* has-text da placeholder yashirinadi */
+
+
+/* ── Fill Type — oddiy input ── */
+.fill-input {
   width: 100%;
   max-width: 380px;
+  display: block;
   margin: 0 auto;
-  min-height: 54px;
   background: var(--s2);
   border: 2px solid var(--border);
   border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: text;
-  transition: border-color .2s;
   padding: 14px 20px;
-  box-sizing: border-box;
+  color: var(--text);
+  font-size: 20px;
+  font-family: 'Helvetica Neue', sans-serif;
+  outline: none;
+  transition: border-color .2s;
+  text-align: left;
+  direction: ltr;
+  caret-color: var(--purple-light);
 }
-
-.fill-input-wrap.focused {
+.fill-input::placeholder {
+  color: var(--text3);
+  text-align: left;
+}
+.fill-input:focus {
   border-color: var(--purple);
   box-shadow: 0 0 0 3px rgba(108,60,225,.12);
 }
-
-.fill-input-wrap.correct { border-color: var(--green); box-shadow: 0 0 0 3px rgba(74,222,128,.15); }
-.fill-input-wrap.wrong   { border-color: var(--red);   box-shadow: 0 0 0 3px rgba(255,90,90,.15); }
-
-/* Ko'rinadigan matn */
-.fill-display {
-  font-size: 20px;
-  font-weight: 600;
-  font-family: 'Helvetica Neue', sans-serif;
-  color: var(--text);
-  text-align: center;
-  position: relative;
-  z-index: 1;
-  min-width: 4px;
-  white-space: pre;
-}
-
-/* Placeholder */
-.fill-placeholder {
-  position: absolute;
-  font-size: 16px;
-  color: var(--text3);
-  pointer-events: none;
-  z-index: 1;
-  user-select: none;
-}
-
-/* Kursor — .fill-display::after */
-@keyframes fill-bar-blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-
-.fill-input-wrap.focused .fill-display::after {
-  content: '';
-  display: inline-block;
-  width: 2px;
-  height: 1.2em;
-  background: var(--purple-light);
-  border-radius: 2px;
-  vertical-align: text-bottom;
-  margin-left: 1px;
-  animation: fill-bar-blink 1s step-end infinite;
-}
-
-/* Matn bor bo'lganda ham kursor ko'rinsin */
-.fill-input-wrap.focused.has-text .fill-display::after {
-  display: inline-block;
-}
-
-/* has-text da placeholder yashirinadi */
-.fill-input-wrap.has-text .fill-placeholder { display: none !important; }
+.fill-input.correct { border-color: var(--green); }
+.fill-input.wrong   { border-color: var(--red); }
