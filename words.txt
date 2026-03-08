@@ -1,0 +1,354 @@
+letters/harflar
+car/mashina
+cars/mashinalar
+dog/kuchuk
+dogs/kuchuklar
+book/kitob
+books/kitoblar
+apple/olma
+apples/olmalar
+bus/avtobus
+buses/avtobuslar
+dish/idish
+dishes/idishlar
+box/quti
+boxes/qutilar
+quiz/viktorina
+quiz/viktorinalar
+leaf/barg
+leaves/barglar
+wolf/bo'ri
+wolves/bo'rilar
+life/hayot
+lives/hayotlar
+knife/pichoq
+knives/pichoqlar
+belief/ishonch
+beliefs/ishonchlar
+roof/tom
+roofs/tomlar
+cliff/jarlik
+cliffs/jarliklar
+chef/oshpaz
+chefs/oshpazlar
+chief/boshliq
+chiefs/boshliqlar
+day/kun
+days/kunlar
+key/kalit
+keys/kalitlar
+boy/bola
+boys/bolalar
+guy/yigit
+guys/yigitlar
+donkey/eshak
+donkeys/eshaklar
+monkey/maymun
+monkeys/maymunlar
+city/shahar
+cities/shaharlar
+baby/chaqaloq
+babies/chaqaloqlar
+story/hikoya
+stories/hikoyalar
+party/ziyofat
+parties/ziyofatlar
+country/mamlakat
+countries/mamlakatlar
+man/erkak
+men/erkaklar
+woman/ayol
+women/ayollar
+child/bola
+children/bolalar
+foot/oyoq
+feet/oyoqlar
+tooth/tish
+teeth/tishlar
+mouse/sichqon
+mice/sichqonlar
+person/odam
+people/odamlar
+zoo/hayvonot bog'i
+zoos/hayvonot bog'lari
+radio/radio
+radios/radiolar
+video/video
+videos/videolar
+kangaroo/kenguru
+kangaroos/kengurular
+hero/qahramon
+hero/esqahramonlar
+echo/aks sado
+echoes/aks sadolar
+tomato/pomidor
+tomatoes/pomidorlar
+potato/kartoshka
+potatoes/kartoshkalar
+piano/pianino
+pianos/pianinolar
+photo/rasm
+photos/rasmlar
+sheep/qo'y
+sheep/qo'ylar
+deer/kiyik
+deer/kiyiklar
+fish/baliq
+fishes/baliqlar
+series/seriya
+series/seriyalar
+species/tur
+species/turlar
+goose/g'oz
+geese/g'ozlar
+octopus/sakkizoyoq
+octopi/sakkizoyoqlar
+wife/xotin
+wives/xotinlar
+one/1
+two/2
+three/3
+four/4
+five/5
+six/6
+seven/7
+eight/8
+nine/9
+ten/10
+eleven/11
+twelve/12
+thirteen/13
+fourteen/14
+fiften/15
+sixteen/16
+seventeen/17
+eighteen/18
+nineteen/19
+twenty/20
+thirty/30
+forty/40
+fifty/50
+sixty/60
+seventy/70
+eighty/80s
+ninety/90
+one hundred/100
+one thousand/1 000
+ten thousand/10 000
+one hundred thousand/100 000
+one million/1 000 000
+one billion/1 000 000 000
+twelve thousand eight hundred and thirty one/12831
+two hundred and forty one/241
+half/yarim
+quarter/chorak
+one and a half/1.500
+one point seven billion/1.7B
+I/Men
+You/Sen (Siz)
+We/Biz
+They/Ular
+He/U (erkak)
+She/U (ayol)
+It/U (narsa)
+My/Mening
+Your/Sening (Sizning)
+Our/Bizning
+Their/Ularning
+His/Uning (erkak)
+Her/Uning (ayol)
+Its/Uning (narsa)
+'S/...ning (tegishlilik)
+I Have got/Menda bor
+You have got/Senda bor
+We have got/Bizda bor
+They have got/Ularda bor
+He has got/Unda bor (erkak)
+She has got/Unda bor (ayol)
+It has got/Unda bor (narsa)
+'/...ning (qisqartma)
+Tall/Baland bo'yli
+Slim/Ingichka, ozg'in
+Beautiful/Chiroyli (ayol)
+Handsome/Kelishgan (erkak)
+Height/Bo'y, balandlik
+Age/Yosh
+Cute/Yoqimli, shirin
+Are you busy/Bandmisiz?
+Day off/Dam olish kuni
+Seasons/Fasllar
+Winter/Qish
+Spring/Bahor
+Summer/Yoz
+Autumn/Kuz
+The end of winter/Qishning oxiri
+Quarter/Chorak
+Half/Yarmi
+From 09:00 to 18:00/Soat 09:00 dan 18:00 gacha
+To rise/Ko'tarilmoq, oshmoq
+Siblings/Aka-uka, opa-singil
+Relative/Qarindosh
+Nuclear family/Tor oila (ota-ona va farzandlar)
+Foster family/Asrab olgan oila
+Childhood/Bolalik
+In-law/Quda-anda, qaynona/qaynotaga oid
+Female/Ayol, urg'ochi
+Male/Erkak, nar
+Parents/Ota-ona
+Grandfather/Bobo
+Grandmother/Buvi
+Married/Turmush qurgan, Erga tekkie
+Father/Ota
+Mother/Ona
+Uncle/Amaki, tog'a
+Aunt/Amma, xola
+Sister in-law/Qayni singil yoki opa
+Daughter in-law/Kelin
+Brother/Aka, uka
+Sister/Opa, singil
+Wife/Xotin, turmush o'rtog'i (ayol)
+Husband/Er, turmush o'rtog'i (erkak)
+Cousin/Amakivachcha, xolavachcha, tog'avachcha
+Nephew/Jiyan (erkak)
+Niece/Jiyan (qiz)
+Son/O'g'il
+Daughter/Qiz
+Grandson/Nevara (o'g'il)
+Granddaughter/Nevara (qiz)
+Grand children/Nevaralar
+Step father/O'gay ota
+Step mother/O'gay ona
+Half brother/O'gay aka yoki uka
+Half sister/O'gay opa yoki singil
+In/Ichida
+On/Ustida
+Under/Tagida
+Below/Pastida
+Above/Ustida, yuqorisida
+Next to/Yonida
+Beside/Yonida, qoshida
+Near/Yaqinida
+Close to/Yaqin
+Between/Orasida
+In front of/Oldida
+Behind/Orqasida
+Across the street/Ko'chaning narigi tomonida
+Opposite/Qarama-qarshi
+Upstairs/Yuqori qavatda
+Downstairs/Quyi qavatda
+Up/Yuqoriga
+Down/Pastga
+Professions/Kasblar
+Jobs/Ishlar, lavozimlar
+Firefighter/O't o'chiruvchi
+Policeman/Politsiyachi (erkak)
+Housewife/Uy bekasi
+Police officer/Politsiya xodimi
+Pilot/Pilot, uchuvchi
+Accountant/Buxgalter, hisobchi
+Architect/Arxitektor, me'mor
+Astronomer/Astronom
+Scientist/Olim
+Author/Muallif
+Writer/Yozuvchi
+Baker/Novvoy
+Butcher/Qassob
+Carpenter/Duradgor
+Dentist/Stomatolog, tish shifokori
+Farmer/Dehqon, fermer
+Judge/Sudya
+Mechanic/Mexanik, usta
+Plumber/Santexnik
+Dressmaker/Tikuvchi, xayyot
+Paramedic/Tibbiy yordamchi, feldsher
+Artist/Rassom, san'atkor
+Mathematician/Matematik
+Musician/Musiqachi
+Politician/Siyosatchi
+Electrician/Elektrik
+Barber/Sartarosh (erkak)
+Hairdresser/Sartarosh, soch ustasi
+Psychiatrist/Psixiatr
+Surgeon/Jarroh
+Bakery/Non do'koni, novvoyxona
+Baker's/Qandolat do'koni
+Maybe/Balki, ehtimol
+I think/Menimcha, deb o'ylayman
+Retired/Nafaqaxo'r, pensioner
+Shy/Uyatchan, tortinchoq
+Make stance/Gap tuzmoq
+Need/Kerak, ehtiyoj
+I don't need/Menga kerak emas
+Important/Muhim
+Possession/Mulk, egalik
+Gadget/Gadjet, qurilma
+Sleep/Uxlamoq, uyqu
+Population/Aholi
+I agree/Men roziman
+I disagree/Men rozi emasman
+I don't think/Menimcha yo'q, shunday deb o'ylamayman
+Questionnarie/So'rovnoma, savol varaqasi
+Survey/So'rovnoma, tadqiqot
+Persent/Foiz (%)
+In a day/Bir kunda, kuniga
+Boring/Zerikarli
+The some/Bir xil, o'sha
+Different/Har xil, farqli
+Similar/O'xshash, shunga o'xshash
+Charity/Xayriya
+Watch (verb)/Tomosha qilmoq, ko'rmoq
+Watch (noun)/Qo'l soati
+It's very kind of you/Siz juda mehribonsiz
+Bless you/Sog' bo'ling (aksirgan vaqtda)
+Excuse me/Kechirasiz, uzr
+Would you like/Xohlaysizmi? Istaysizmi?
+I'd love to/Bajonidil, albatta
+It's my pleasure/Mamnuniyat bilan, arzimaydi
+Can I sit here/Bu yerga o'tirsam bo'ladimi?
+Sorry it's taken/Kechirasiz, bu joy band
+That's OK Don't worry/Hechqisi yo'q, xavotir olmang
+Polite/Odobli, muloyim
+I spend time with my family/Men oilam bilan vaqt o'tkazaman
+Cinnamon/Dolchin
+Digestion/Hazm qilish, ovqat hazm bo'lishi
+Immune system/Immunitet tizimi
+Immunity protection/Immunitet himoyasi
+Biscuits/Pechenye, keks, biskvit
+Kitten/Mushukcha (mushuk bolasi)
+Puppy/Kuchukcha (kuchuk bolasi)
+Pasta/Makaron, pasta
+Cam/Kelgan...
+There is/U yerda bor..., mavjud...
+Who/Kim?
+What/Nima?
+When/Qachon?
+Where/Qayerda?
+Why/Nima uchun, nega?
+Which/Qaysi?
+Whose/Kimning?
+How/Qanday?
+How many/Nechta (sanaladigan narsalar)?
+How much/Qancha (sanalmaydigan narsalar)?
+How can I help you/Sizga qanday yordam bera olaman?
+Sorry I don't know/Kechirasiz, bilmayman
+Far/Uzoq, uzoqlikda
+Average/O'rtacha
+Medium/O'rta
+So so/Shunday-shunday, o'rtacha
+Always/Doimo, har doim
+Usually/Odatda, ko'pincha
+Often/Tez-tez, ko'p
+Sometimes/Ba'zan, gohida
+Never/Hech qachon
+Acquaintance/Tanish, ko'rishgan odam
+Trip/Sayohat, qisqa safar
+Travel/Sayohat qilmoq, sayyohlik
+Journey/Uzoq safar, yo'l
+Go to/...ga bormoq
+Go by/...bilan bormoq (transport vositasiga minib)
+Healthy life style/Sog'lom turmush tarzi
+Switzerland/Shveytsariya
+Capital city/Poytaxt shahar
+Use/Ishlatmoq, foydalanmoq
+Too many/Juda ko'p (sanaladigan)
+Crowded/Gavjum, olomon
