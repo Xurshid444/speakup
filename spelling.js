@@ -102,7 +102,7 @@ $('sp-input').addEventListener('input',e=>{
     if(answer[bi]===' ') continue;
     if(charCount === inputNoSp.length){
       const nextBox = document.getElementById('spb-'+bi);
-      if(nextBox) nextBox.classList.add('sp-cursor');
+      if(nextBox){ nextBox.classList.add('active'); nextBox.classList.add('sp-cursor'); }
       break;
     }
     charCount++;
@@ -112,7 +112,7 @@ $('sp-input').addEventListener('input',e=>{
     if(answer[i]===' ')continue; const box=$(`spb-${i}`); if(!box)continue;
     const ch=(input.replace(/ /g,''))[li]||'';
     box.textContent=ch;
-    if(ch==='') box.className=(li===input.replace(/ /g,'').length)?'sp-box active':'sp-box';
+    if(ch==='') box.className=(li===input.replace(/ /g,'').length)?'sp-box active sp-cursor':'sp-box';
     else if(ch===answer[i]) box.className='sp-box correct';
     else box.className='sp-box wrong';
     li++;

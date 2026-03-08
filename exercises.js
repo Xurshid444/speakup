@@ -61,24 +61,49 @@ function renderFt(){
   $('ft-prog-txt').textContent=`${FT.idx+1} / ${total}`; $('ft-score-txt').textContent=`✅ ${FT.score}`; $('ft-prog-fill').style.width=(FT.idx/total*100)+'%'; $('ft-feedback').style.display='none';
   const parts=q.s.split('___'); $('ft-sentence').innerHTML=parts.length===2?`${parts[0]}<span class="blank-spot">___</span>${parts[1]}`:q.s;
   const inp=$('ft-input'); inp.value=''; inp.className='fill-input'; inp.disabled=false;
-  setTimeout(()=>{
-    inp.focus();
-    // Kursor o'rtaga — placeholder ko'rinayotganda setSelectionRange ishlamaydi
-    // Shuning uchun value bo'sh bo'lganda text-align:center caret ni o'rtaga qo'yadi
-    inp.setSelectionRange(0,0);
-  },100);
+  setTimeout(()=>{ inp.focus(); },100);
 }
 function checkFt(){
   if(FT.busy)return; const q=FT.items[FT.idx]; const val=$('ft-input').value.trim().toLowerCase(); if(!val)return; FT.busy=true;
-  const fb=$('ft-feedback'); const inp=$('ft-input'); inp.disabled=true;
+  const fb=$('ft-feedback'); const inp=$('ft-input'); inp.disabled=true; const wrapD=document.getElementById('ft-wrap'); if(wrapD) wrapD.classList.remove('focused');
   if(val===q.a.toLowerCase()){
-    FT.score++; inp.className='fill-input correct'; fb.className='ex-feedback correct'; fb.textContent=`✅ To'g'ri! "${q.a}"`; fb.style.display='block';
+    FT.score++;
+    const wrapC=document.getElementById('ft-wrap');
+    if(wrapC) wrapC.classList.add('correct'); fb.className='ex-feedback correct'; fb.textContent=`✅ To'g'ri! "${q.a}"`; fb.style.display='block';
   }else{
-    inp.className='fill-input wrong'; fb.className='ex-feedback wrong'; fb.textContent=`❌ Noto'g'ri. To'g'ri javob: "${q.a}"`; fb.style.display='block';
+    const wrapW=document.getElementById('ft-wrap');
+    if(wrapW) wrapW.classList.add('wrong'); fb.className='ex-feedback wrong'; fb.textContent=`❌ Noto'g'ri. To'g'ri javob: "${q.a}"`; fb.style.display='block';
   }
   setTimeout(()=>{FT.idx++;FT.busy=false;renderFt();},1500);
 }
 $('ft-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkFt();});
+$('ft-input').addEventListener('input',e=>{
+  const val=e.target.value;
+  const disp=document.getElementById('ft-display');
+  const ph=document.getElementById('ft-placeholder');
+  const wrap=document.getElementById('ft-wrap');
+  if(disp) disp.textContent=val;
+  if(ph) ph.style.display=val?'none':'block';
+  if(wrap){ wrap.classList.toggle('has-text',!!val); wrap.classList.remove('correct','wrong'); }
+});
+$('ft-input').addEventListener('focus',()=>{
+  const wrap=document.getElementById('ft-wrap');
+  if(wrap) wrap.classList.add('focused');
+});
+$('ft-input').addEventListener('blur',()=>{
+  const wrap=document.getElementById('ft-wrap');
+  if(wrap) wrap.classList.remove('focused');
+});
+// Caret o'rtada turishi uchun: focus da scroll end ga o'tkazamiz
+(function(){
+  const inp2 = $('ft-input');
+  const ph = document.getElementById('ft-placeholder');
+  if(!inp2 || !ph) return;
+  function updatePh(){ ph.style.display = inp2.value ? 'none' : ''; }
+  inp2.addEventListener('focus', function(){ ph.style.display='none'; });
+  inp2.addEventListener('blur',  function(){ updatePh(); });
+  inp2.addEventListener('input', function(){ updatePh(); });
+})();
 function showFtScore(){ $('ft-game').style.display='none'; $('ft-score').style.display='block'; $('ft-sc-num').textContent=FT.score; $('ft-sc-total').textContent=`/ ${FT.items.length} ta savol`; $('ft-sc-msg').textContent=scoreMsg(Math.round(FT.score/FT.items.length*100)); }
 
 // WORD ORDER

@@ -132,7 +132,7 @@ function mydRenderCard(){
       var i = charIdx;
       var isFirst = (charIdx === 0);
       charIdx++;
-      return '<div class="sp-box'+(isFirst?' active':'')+'" id="myd-box-'+i+'"></div>';
+      return '<div class="sp-box'+(isFirst?' active sp-cursor':'')+'" id="myd-box-'+i+'"></div>';
     }).join('');
     charIdx++;
     return '<div class="myd-word-group">'+letterDivs+'</div>';

@@ -273,7 +273,11 @@
       <div id="ft-game" style="display:none;">
         <div class="back-btn" id="ft-back-lessons"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Darslarga qaytish</div>
         <div class="ex-progress-bar-wrap"><div class="ex-top-row"><span class="ex-prog-label" id="ft-prog-txt"></span><span class="ex-score-label" id="ft-score-txt"></span></div><div class="ex-progress-bar"><div class="ex-progress-fill" id="ft-prog-fill" style="width:0%"></div></div></div>
-        <div class="ex-card"><div class="ex-sentence" id="ft-sentence"></div><input class="fill-input" id="ft-input" placeholder="yozing..." autocomplete="off" autocorrect="off" spellcheck="false"/><div class="ex-feedback" id="ft-feedback" style="display:none;"></div></div>
+        <div class="ex-card"><div class="ex-sentence" id="ft-sentence"></div><div class="fill-input-wrap" id="ft-wrap" onclick="document.getElementById('ft-input').focus()">
+  <div class="fill-display" id="ft-display"></div>
+  <span class="fill-placeholder" id="ft-placeholder">yozing...</span>
+  <input class="fill-real-input" id="ft-input" autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text"/>
+</div><div class="ex-feedback" id="ft-feedback" style="display:none;"></div></div>
       </div>
       <div id="ft-score" style="display:none;"><div class="back-btn" id="ft-score-back"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg> Unitlarga qaytish</div><div class="score-card"><div class="score-num" id="ft-sc-num">0</div><div class="score-total" id="ft-sc-total"></div><div class="score-msg" id="ft-sc-msg"></div><button class="btn btn-g" id="ft-retry" style="width:auto;margin:0 auto;display:flex;">🔄 Qaytadan</button></div></div>
     </div>
