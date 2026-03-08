@@ -690,14 +690,10 @@ input[type="text"], input:not([type]), textarea {
 .trn-pill:hover { background:rgba(108,60,225,.18); }
 
 /* ── SP-BOX cursor animatsiyasi ── */
-@keyframes sp-blink {
-  0%,100% { box-shadow: 0 0 0 2px var(--purple); border-color: var(--purple); }
+
   50%      { box-shadow: 0 0 0 4px rgba(108,60,225,.4); border-color: var(--purple-light); }
-}
-.sp-box.sp-cursor {
-  border-color: var(--purple) !important;
-  animation: sp-blink 1s ease-in-out infinite;
-}
+
+
 
 /* ── MCQ variantlar — rangli ── */
 .opt-a { border-color: rgba(108,60,225,.35) !important; }
@@ -793,21 +789,10 @@ html { font-size: var(--fs-base, 24px); }
 
 
 /* ── SP-CURSOR — katak ichida qimirlab turadigan kursor ── */
-@keyframes sp-blink {
-  0%, 49% { 
-    box-shadow: inset 0 0 0 2.5px var(--purple), 0 0 8px rgba(108,60,225,.4);
-    border-color: var(--purple) !important;
-  }
-  50%, 100% { 
-    box-shadow: inset 0 0 0 2.5px rgba(108,60,225,.25);
-    border-color: rgba(108,60,225,.3) !important;
-  }
-}
-.sp-box.sp-cursor {
-  animation: sp-blink 0.9s ease-in-out infinite !important;
-  border-color: var(--purple) !important;
-  background: rgba(108,60,225,.08);
-}
+
+
+
+
 
 /* ── MCQ opt ranglari kuchaytirish ── */
 .opt-a { 
@@ -906,30 +891,12 @@ html { font-size: var(--fs-base, 24px); }
 }
 
 /* ── SP-BOX ichida vertikal kursor (cursor bar) ── */
-@keyframes cursor-blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
 
-.sp-box.sp-cursor {
-  border-color: var(--purple) !important;
-  background: var(--pdim) !important;
-  box-shadow: 0 0 0 3px rgba(108,60,225,.18) !important;
-  position: relative;
-}
 
-.sp-box.sp-cursor::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 20%;
-  transform: translateX(-50%);
-  width: 2px;
-  height: 60%;
-  background: var(--purple-light);
-  border-radius: 2px;
-  animation: cursor-blink 1s step-end infinite;
-}
+
+
+
+
 
 /* Agar katak bo'sh bo'lsa kursor ko'rinsin, harf kiritilsa yo'qolsin */
 .sp-box.sp-cursor:not(:empty)::after {
@@ -940,10 +907,8 @@ html { font-size: var(--fs-base, 24px); }
 
 
 /* Caret animation — fill-input ichida */
-@keyframes caret-pulse {
-  0%, 100% { caret-color: var(--purple-light); }
-  50% { caret-color: transparent; }
-}
+
+
 
 .fill-input:focus {
   border-color: var(--purple) !important;
@@ -968,13 +933,82 @@ html { font-size: var(--fs-base, 24px); }
 .fill-input::placeholder {
   color: var(--text3);
   text-align: center;
-}
 /* focus da animatsiyali caret */
-@keyframes fill-caret {
-  0%, 49% { caret-color: var(--purple-light); }
-  50%, 100% { caret-color: transparent; }
+
 }
 .fill-input:focus {
   border-color: var(--purple) !important;
   animation: fill-caret 1s step-end infinite;
 }
+
+/* ═══════════════════════════════════════
+   SP-BOX KURSOR — katak ichida | chiziq
+   ═══════════════════════════════════════ */
+@keyframes bar-blink {
+  0%, 49% { opacity: 1; }
+}
+
+/* Active katak — border highlighted, qimirlamaydi */
+.sp-box.active {
+  border-color: var(--purple);
+  background: var(--pdim);
+  box-shadow: 0 0 0 3px rgba(108,60,225,.15);
+}
+
+/* Kursor chiziq — faqat bo'sh active katakda */
+.sp-box.sp-cursor {
+  border-color: var(--purple) !important;
+  background: var(--pdim) !important;
+  position: relative;
+}
+.sp-box.sp-cursor::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 64%;
+  background: var(--purple-light);
+  border-radius: 2px;
+  animation: bar-blink 1s step-end infinite;
+  pointer-events: none;
+}
+/* Harf kiritilganda kursor yo'qoladi */
+.sp-box.sp-cursor:not(:empty)::after {
+  display: none;
+}
+
+/* ═══════════════════════════════════════
+   FILL TYPE — kursor o'rtada
+   ═══════════════════════════════════════ */
+@keyframes fill-caret-blink {
+  0%, 49% { caret-color: var(--purple-light); }
+}
+.fill-input {
+  width: 100%;
+  max-width: 420px;
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+  caret-color: var(--purple-light);
+  padding: 14px 20px;
+  border-radius: 14px;
+  font-size: 20px;
+  background: var(--s2);
+  border: 2px solid var(--border);
+  color: var(--text);
+  outline: none;
+  transition: border-color .2s;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+.fill-input::placeholder {
+  text-align: center;
+  color: var(--text3);
+}
+.fill-input:focus {
+  border-color: var(--purple);
+  animation: fill-caret-blink 1s step-end infinite;
+}
+.fill-input.correct { border-color: var(--green); }
+.fill-input.wrong   { border-color: var(--red);   }
