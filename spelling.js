@@ -67,7 +67,7 @@ function checkSpelling(typed){
     const typedCh = (input.replace(/ /g,''))[letterIdx] || '';
     box.textContent = typedCh || '';
     if(typedCh === '') {
-      box.className = (letterIdx === input.replace(/ /g,'').length) ? 'sp-box active' : 'sp-box';
+      box.className = (letterIdx === input.replace(/ /g,'').length) ? 'sp-box active sp-cursor' : 'sp-box';
     } else if(typedCh === answer[i]){ box.className='sp-box correct'; }
     else { box.className='sp-box wrong'; allCorrect = false; }
     letterIdx++;
