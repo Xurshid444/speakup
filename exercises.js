@@ -74,6 +74,10 @@ function checkFt(){
   setTimeout(()=>{FT.idx++;FT.busy=false;renderFt();},1500);
 }
 $('ft-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkFt();});
+$('ft-input').addEventListener('compositionend',()=>{
+  // Samsung va boshqa Android klaviaturalar uchun
+  $('ft-input').dispatchEvent(new Event('input',{bubbles:true}));
+});
 
 
 

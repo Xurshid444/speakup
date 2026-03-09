@@ -1,3 +1,36 @@
+
+// ═══════════════════════════════════════════════════
+// MOBILE: Klaviatura ochilish/yopilish deteksiyasi
+// ═══════════════════════════════════════════════════
+(function(){
+  if(!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
+  
+  const THRESHOLD = 150; // px
+  const initialHeight = window.innerHeight;
+  
+  window.addEventListener('resize', function(){
+    const currentHeight = window.innerHeight;
+    const diff = initialHeight - currentHeight;
+    if(diff > THRESHOLD){
+      // Klaviatura ochildi
+      document.body.classList.add('keyboard-open');
+      // Faol inputni scroll qilib ko'rsatish
+      setTimeout(function(){
+        const active = document.activeElement;
+        if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')){
+          active.scrollIntoView({behavior:'smooth', block:'center'});
+        }
+        // Spelling/mydict — sp-row ko'rsatish
+        const spRow = document.querySelector('.sp-row');
+        if(spRow) spRow.scrollIntoView({behavior:'smooth', block:'center'});
+      }, 100);
+    } else {
+      // Klaviatura yopildi
+      document.body.classList.remove('keyboard-open');
+    }
+  });
+})();
+
 // ════════════════════════════
 // INIT — Boshlash tugmasi
 // ════════════════════════════
@@ -282,11 +315,10 @@ function toggleMoreMenu(){
 function closeMore(){
   document.getElementById('more-menu').classList.remove('open');
 }
-// More menu tashqarisiga bosish — yopish
+// More menu tashqarisiga bosish — yopish (legacy)
 document.addEventListener('click',function(e){
   const menu=document.getElementById('more-menu');
-  const moreBtn=document.querySelector('.bn-item[data-tab="more"]');
-  if(menu && menu.classList.contains('open') && !menu.contains(e.target) && moreBtn && !moreBtn.contains(e.target)){
+  if(menu && menu.classList.contains('open') && !menu.contains(e.target)){
     menu.classList.remove('open');
   }
 });
@@ -305,5 +337,6 @@ document.querySelectorAll('.bn-item:not([data-tab="more"])').forEach(tab=>{
 // ══════════════════════════════════════════════════════
 
 // Bottom nav more button
+// more button (endi yo'q, legacy)
 const moreBn=document.querySelector('.bn-item[data-tab="more"]');
 if(moreBn) moreBn.addEventListener('click',function(e){ e.stopPropagation(); toggleMoreMenu(); });

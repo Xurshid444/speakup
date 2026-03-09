@@ -118,7 +118,20 @@ $('sp-input').addEventListener('input',e=>{
     li++;
   }
 });
-$('sp-input').addEventListener('keydown',e=>{ if(e.key==='Enter'){ const val=$('sp-input').value.trim(); if(val) checkSpelling(val); } });
+$('sp-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){ const val=$('sp-input').value.trim(); if(val) checkSpelling(val); }
+  // Backspace — qo'lda o'chirish (Android uchun)
+  if(e.key==='Backspace'){
+    const inp=$('sp-input');
+    if(inp.value.length===0) return;
+    // Input event avtomatik chaqiriladi, qo'shimcha narsa kerak emas
+  }
+});
+// Android composing event uchun
+$('sp-input').addEventListener('compositionend',e=>{
+  const ev = new Event('input',{bubbles:true});
+  $('sp-input').dispatchEvent(ev);
+});
 $('sp-hint-btn').addEventListener('click',()=>{
   const w=SP.words[SP.idx]; if(!w)return; SP.hints++; const answer=w.en.toLowerCase(); const inp=$('sp-input');
   if(inp.value.length < answer.length){

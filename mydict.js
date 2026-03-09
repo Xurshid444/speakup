@@ -148,9 +148,9 @@ function mydRenderCard(){
   setTimeout(function(){
     inp.focus();
     setTimeout(function(){
-      var card = document.getElementById('myd-sp-wrap');
-      if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
-    }, 350);
+      var letters = document.getElementById('myd-sp-letters');
+      if(letters) letters.scrollIntoView({behavior:'smooth', block:'center'});
+    }, 400);
   }, 80);
 }
 
@@ -175,7 +175,14 @@ document.getElementById('myd-sp-input').addEventListener('input', function(){
   }
 });
 
-document.getElementById('myd-sp-input').addEventListener('keydown', function(e){ if(e.key==='Enter') mydCheck(); });
+document.getElementById('myd-sp-input').addEventListener('keydown', function(e){
+  if(e.key==='Enter') mydCheck();
+});
+// Android composing (Samsung klaviatura va boshqalar) uchun
+document.getElementById('myd-sp-input').addEventListener('compositionend', function(){
+  var ev = new Event('input',{bubbles:true});
+  document.getElementById('myd-sp-input').dispatchEvent(ev);
+});
 
 function mydSpeakWord(word, onDone){
   if(!window.speechSynthesis){ setTimeout(onDone, 300); return; }
