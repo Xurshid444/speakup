@@ -542,9 +542,59 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .myd-feedback-wrap .sp-feedback{text-align:center;max-width:500px;width:100%;margin:0 auto;margin:0;width:100%;text-align:center;border-radius:14px;padding:12px 18px;font-size:14px;font-weight:600;}
 
 /* Tugmalar */
-.myd-actions-bar{display:grid;grid-template-columns:1fr 2fr 1fr;gap:10px;margin-top:4px;}
-.myd-btn-hint{display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 10px;border-radius:14px;background:rgba(255,209,102,.12);border:1.5px solid rgba(255,209,102,.5);color:var(--gold);font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap;}
-.myd-btn-hint:hover{background:rgba(255,209,102,.22);}
+.myd-actions-bar{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:8px;
+  width:100%;
+  max-width:580px;
+  margin-left:auto;
+  margin-right:auto;
+}
+/* Maslahat — kichik icon, yuqori o'ng burchak */
+.myd-btn-hint-icon{
+  position:absolute;
+  top:-52px;
+  right:0;
+  width:40px;height:40px;
+  border-radius:12px;
+  background:rgba(255,209,102,.12);
+  border:1.5px solid rgba(255,209,102,.4);
+  color:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:all .18s;
+  z-index:10;
+}
+.myd-btn-hint-icon:hover{background:rgba(255,209,102,.25);}
+.myd-btn-hint-icon:active{transform:scale(.93);}
+
+/* 3 asosiy tugma qatori */
+.myd-main-btns{
+  display:grid;
+  grid-template-columns:1fr 2fr 1fr;
+  gap:10px;
+  width:100%;
+}
+/* Ortga */
+.myd-btn-back{
+  display:flex;align-items:center;justify-content:center;
+  gap:6px;
+  padding:14px 10px;
+  border-radius:14px;
+  background:var(--s3);
+  border:1.5px solid var(--border2);
+  color:var(--text3);
+  font-size:13px;font-weight:600;
+  cursor:pointer;
+  transition:all .18s;
+  white-space:nowrap;
+  font-family:'Helvetica Neue',sans-serif;
+}
+.myd-btn-back:hover{background:var(--s2);color:var(--text);}
+.myd-btn-back:active{transform:scale(.96);}
 .myd-btn-check{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 10px;border-radius:14px;background:linear-gradient(120deg,var(--accent),#00b890);border:none;color:#05120e;font-size:15px;font-weight:800;cursor:pointer;transition:all .18s;box-shadow:0 4px 18px rgba(0,229,176,.25);}
 .myd-btn-check:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,229,176,.35);}
 

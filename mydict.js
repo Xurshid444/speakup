@@ -264,11 +264,13 @@ document.getElementById('myd-skip-btn').addEventListener('click', function(){
   mydSpeakWord(w.en, function(){ document.getElementById('myd-sp-input').disabled=false; MYD.idx++; mydRenderCard(); });
 });
 
-document.getElementById('myd-back-btn').addEventListener('click', function(){
+function mydGoBack(){
   window.speechSynthesis && window.speechSynthesis.cancel();
   document.getElementById('myd-game').style.display='none';
   document.getElementById('myd-home').style.display='block';
-});
+}
+document.getElementById('myd-back-btn').addEventListener('click', mydGoBack);
+document.getElementById('myd-back-btn2').addEventListener('click', mydGoBack);
 document.getElementById('myd-score-back').addEventListener('click', function(){
   document.getElementById('myd-score').style.display='none';
   document.getElementById('myd-home').style.display='block';
