@@ -994,3 +994,98 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 }
 .play-rec-btn:hover{background:rgba(108,60,225,.25);transform:scale(1.03);}
 .play-rec-btn:disabled{opacity:.5;cursor:default;}
+
+/* ═══════════════════════════════════
+   MYD GAME — Paket badge (top nav)
+   ═══════════════════════════════════ */
+.myd-game-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+.myd-nav-paket {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(108,60,225,.12);
+  border: 1.5px solid rgba(108,60,225,.28);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--purple-light);
+  letter-spacing: .01em;
+  white-space: nowrap;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.myd-nav-paket svg { flex-shrink: 0; opacity: .8; }
+
+/* ═══════════════════════════════════
+   MYD SCORE — 3 tugma
+   ═══════════════════════════════════ */
+.myd-score-paket-tag {
+  display: inline-block;
+  background: rgba(108,60,225,.1);
+  border: 1.5px solid rgba(108,60,225,.25);
+  border-radius: 20px;
+  padding: 5px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--purple-light);
+  letter-spacing: .02em;
+  margin-bottom: 12px;
+}
+.myd-score-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 1fr;
+  gap: 10px;
+  width: 100%;
+  margin-top: 22px;
+}
+.myd-score-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px 10px 16px;
+  border-radius: 18px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Helvetica Neue', sans-serif;
+  cursor: pointer;
+  border: none;
+  transition: all .18s;
+  line-height: 1.2;
+  -webkit-tap-highlight-color: transparent;
+}
+.myd-score-back {
+  background: var(--s3);
+  border: 1.5px solid var(--border2);
+  color: var(--text2);
+}
+.myd-score-back:hover { background: var(--s2); color: var(--text); }
+.myd-score-retry {
+  background: linear-gradient(140deg, var(--purple) 0%, #8B5CF6 100%);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(108,60,225,.35);
+}
+.myd-score-retry:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(108,60,225,.45); }
+.myd-score-next {
+  background: linear-gradient(140deg, var(--accent) 0%, #00b890 100%);
+  color: #032b22;
+  font-weight: 800;
+  box-shadow: 0 6px 20px rgba(0,212,170,.28);
+}
+.myd-score-next:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,212,170,.38); }
+.myd-score-btn:active { transform: scale(.95) !important; }
+@media (max-width: 400px) {
+  .myd-score-actions { gap: 7px; }
+  .myd-score-btn { font-size: 11px; padding: 14px 6px 12px; gap: 6px; }
+  .myd-score-btn svg { width: 18px; height: 18px; }
+}

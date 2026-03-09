@@ -113,11 +113,15 @@ function mydRenderPackets(){
 var MYD = { words:[], idx:0, score:0, wrong:[], currentPktIdx:-1 };
 
 function startMydGame(pktIdx){
-  var pkt = mydGetPackets()[pktIdx];
+  var packets = mydGetPackets();
+  var pkt = packets[pktIdx];
   if(!pkt){ showToast('⚠️ Paket topilmadi'); return; }
   MYD.currentPktIdx = pktIdx;
   MYD.words = mydShuffleArr(pkt.words.slice());
   MYD.idx=0; MYD.score=0; MYD.wrong=[];
+  // Paket badge yangilash
+  var lbl = document.getElementById('myd-paket-label-txt');
+  if(lbl) lbl.textContent = pkt.name + '  ·  ' + (pktIdx+1) + ' / ' + packets.length;
   document.getElementById('myd-home').style.display='none';
   document.getElementById('myd-score').style.display='none';
   document.getElementById('myd-game').style.display='block';
@@ -284,15 +288,41 @@ document.getElementById('myd-score-back').addEventListener('click', function(){
 document.getElementById('myd-retry-btn').addEventListener('click', function(){
   if(MYD.currentPktIdx >= 0) startMydGame(MYD.currentPktIdx);
 });
+document.getElementById('myd-next-pkt-btn').addEventListener('click', function(){
+  var nextIdx = MYD.currentPktIdx + 1;
+  var packets = mydGetPackets();
+  if(nextIdx < packets.length) startMydGame(nextIdx);
+  else { document.getElementById('myd-score').style.display='none'; document.getElementById('myd-home').style.display='block'; }
+});
 
 function mydShowScore(){
   document.getElementById('myd-game').style.display='none';
   document.getElementById('myd-score').style.display='block';
-  var total=MYD.words.length;
-  document.getElementById('myd-sc-num').textContent=MYD.score;
-  document.getElementById('myd-sc-total').textContent='/ '+total+' ta so\'z';
-  document.getElementById('myd-sc-msg').textContent=scoreMsg(Math.round(MYD.score/total*100));
-  var wl=document.getElementById('myd-wrong-list'); wl.innerHTML='';
+  var packets = mydGetPackets();
+  var total = MYD.words.length;
+  document.getElementById('myd-sc-num').textContent = MYD.score;
+  document.getElementById('myd-sc-total').textContent = '/ '+total+' ta so\'z';
+  document.getElementById('myd-sc-msg').textContent = scoreMsg(Math.round(MYD.score/total*100));
+  // Paket tagi
+  var tag = document.getElementById('myd-score-paket-tag');
+  if(tag && MYD.currentPktIdx >= 0){
+    var pkt = packets[MYD.currentPktIdx];
+    tag.textContent = pkt ? (pkt.name + '  ·  ' + (MYD.currentPktIdx+1) + ' / ' + packets.length) : '';
+  }
+  // Keyingi paket tugmasi
+  var nextBtn = document.getElementById('myd-next-pkt-btn');
+  var nextLbl = document.getElementById('myd-next-pkt-label');
+  var nextIdx = MYD.currentPktIdx + 1;
+  if(nextBtn){
+    if(nextIdx < packets.length && MYD.currentPktIdx >= 0){
+      nextBtn.style.display = 'flex';
+      if(nextLbl) nextLbl.textContent = packets[nextIdx].name;
+    } else {
+      nextBtn.style.display = 'none';
+    }
+  }
+  // Xatolar ro'yxati
+  var wl = document.getElementById('myd-wrong-list'); wl.innerHTML='';
   MYD.wrong.forEach(function(w){
     var d=document.createElement('div');
     d.style.cssText='background:var(--rdim);border:1px solid rgba(255,90,90,.2);border-radius:10px;padding:9px 12px;font-size:13px;';
