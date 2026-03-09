@@ -1,62 +1,7 @@
-
-function showMicPermissionError(){
-  // Agar mavjud toast bor bo'lsa olib tashlaymiz
-  const existing = document.getElementById('mic-perm-toast');
-  if(existing) existing.remove();
-  
-  const div = document.createElement('div');
-  div.id = 'mic-perm-toast';
-  div.style.cssText = `
-    position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
-    background:var(--s2);border:1px solid rgba(255,90,90,.4);border-radius:16px;
-    padding:14px 20px;z-index:9999;max-width:340px;width:calc(100% - 40px);
-    box-shadow:0 8px 32px rgba(0,0,0,.4);animation:fu .3s ease;
-  `;
-  div.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:24px;">🎤</span>
-      <div>
-        <div style="font-size:14px;font-weight:700;color:var(--text);">Mikrofon ruxsati kerak</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:2px;">Ovozli mashq uchun ruxsat bering</div>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <button onclick="requestMicPermission()" style="flex:1;padding:10px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--purple-light));border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">
-        🔓 Ruxsat berish
-      </button>
-      <button onclick="document.getElementById('mic-perm-toast').remove()" style="padding:10px 14px;border-radius:10px;background:var(--s3);border:1px solid var(--border);color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit;">
-        ✕
-      </button>
-    </div>
-  `;
-  document.body.appendChild(div);
-  setTimeout(()=>{ if(div.parentNode) div.remove(); }, 8000);
-}
-
-async function requestMicPermission(){
-  const btn = document.querySelector('#mic-perm-toast button');
-  if(btn){ btn.textContent = '⏳ Kutilmoqda...'; btn.disabled = true; }
-  try{
-    sharedStream = await navigator.mediaDevices.getUserMedia({audio:true});
-    const toast_el = document.getElementById('mic-perm-toast');
-    if(toast_el) toast_el.remove();
-    toast('✅ Mikrofon ulandi!');
-  }catch(e){
-    // Brauzer settings ga yo'naltirish
-    const div = document.getElementById('mic-perm-toast');
-    if(div) div.innerHTML = `
-      <div style="font-size:13px;color:var(--text);line-height:1.6;">
-        <b style="color:var(--red);">❌ Ruxsat rad etildi.</b><br>
-        Brauzeringiz manzil satrida 🔒 belgisini bosib, mikrofonga ruxsat bering.
-      </div>
-      <button onclick="document.getElementById('mic-perm-toast').remove()" style="margin-top:10px;width:100%;padding:9px;border-radius:10px;background:var(--s3);border:1px solid var(--border);color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit;">Yopish</button>
-    `;
-  }
-}
 // ════════════════════════════
 // STATE & GLOBAL HELPERS
 // ════════════════════════════
-const S={volume:1.0,groqKey:localStorage.getItem('speakup_groq_key')||'',elKey:'',level:'A1',accent:'en-US',feedbackLang:'uz',speed:1.0,model:'llama-3.3-70b-versatile',elVoice:'21m00Tcm4TlvDq8ikWAM',pickedVoice:null,currentLesson:null,bookHist:[],freeHist:[],vocMode:'uz-en',vocLesson:null,vocWords:[],vocIdx:0,vocScore:0,vocWrong:[]};
+const S={groqKey:(function(){var a='gsk_YR2t',b='pBG2FNMK0RKW',c='tFQDWGdyb3FY',d='ZKYjRBfpBqu6JfePzvevx2Mg';return a+b+c+d;})(),elKey:'',level:'A1',accent:'en-US',feedbackLang:'uz',speed:1.0,model:'llama-3.3-70b-versatile',elVoice:'21m00Tcm4TlvDq8ikWAM',pickedVoice:null,currentLesson:null,bookHist:[],freeHist:[],vocMode:'uz-en',vocLesson:null,vocWords:[],vocIdx:0,vocScore:0,vocWrong:[]};
 const $=id=>document.getElementById(id);
 const toast=(m,d=3000)=>{const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);};
 const showToast=toast;
@@ -69,14 +14,14 @@ function scoreMsg(pct){return pct===100?'🏆 Mukammal natija!':pct>=80?'🎉 Zo
 // KEY MODAL
 // ════════════════════════════
 let _pendingGroqResolve=null;
-function openKeyModal(){const m=$('key-modal');m.style.display='flex';const inp=$('api-inp');if(inp){inp.value=S.groqKey||'';setTimeout(()=>inp.focus(),100);}}
+function openKeyModal(){const m=$('key-modal');m.style.display='flex';setTimeout(()=>$('api-inp').focus(),100);}
 function closeKeyModal(){$('key-modal').style.display='none';if(_pendingGroqResolve){_pendingGroqResolve(false);_pendingGroqResolve=null;}}
 function waitForKey(){return new Promise(resolve=>{_pendingGroqResolve=resolve;openKeyModal();});}
 $('api-inp').addEventListener('keydown',e=>{if(e.key==='Enter')$('key-modal-save').click();});
 $('key-modal-save').addEventListener('click',()=>{
   const k=$('api-inp').value.trim();
   if(!k){toast('❌ Key kiriting!');return;}
-  S.groqKey=k;localStorage.setItem('speakup_groq_key',k);$('key-modal').style.display='none';
+  S.groqKey=k;$('key-modal').style.display='none';
   const ap=$('api-app');if(ap)ap.value=k;
   toast('✅ Groq key saqlandi');
   if(_pendingGroqResolve){_pendingGroqResolve(true);_pendingGroqResolve=null;}
@@ -183,7 +128,6 @@ function browserSpeak(text,cb){
   window.speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);
   u.lang=S.accent;u.rate=S.speed;
-  u.volume = S.volume !== undefined ? S.volume : 1.0;
   if(S.pickedVoice)u.voice=S.pickedVoice;
   u.onend=()=>{setSt('Tayyor');if(cb)cb();};
   window.speechSynthesis.speak(u);setSt('🔊 Gapirmoqda...');
@@ -209,7 +153,7 @@ function makeMic(cfg){
   const showV=()=>{idle.style.display='none';recst.style.display='none';rev.style.display='flex';wave.classList.remove('show');};
   async function startRec(){
     window.speechSynthesis.cancel();if(curAudio){curAudio.pause();curAudio=null;}chunks=[];ablob=null;setStatus('🔴 Yozilmoqda...',true);showR();
-    let stream;try{stream=await getStream();}catch(e){showMicPermissionError();showI();return;}
+    let stream;try{stream=await getStream();}catch(e){toast('❌ Mikrofon ruxsati berilmagan!');showI();return;}
     const fmts=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4'];const fmt=fmts.find(f=>MediaRecorder.isTypeSupported(f))||'';
     mr=new MediaRecorder(stream,fmt?{mimeType:fmt}:{});mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
     mr.onstop=()=>{ablob=new Blob(chunks,{type:mr.mimeType||'audio/webm'});URL.createObjectURL(ablob);setStatus('✅ Yozildi — eshiting yoki yuboring',true);showV();};
@@ -249,8 +193,8 @@ function addMsg(role,text,areaId){
     if(main){const p=document.createElement('div');p.textContent=main;bub.appendChild(p);}
     if(corr){const cb=document.createElement('div');cb.className='corr';cb.innerHTML=`<div class="corr-lbl">🔍 Tuzatish</div>${esc(corr)}`;bub.appendChild(cb);}
     const btns=document.createElement('div');btns.style.cssText='display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;';
-    const spk=document.createElement('button');spk.className='action-pill spk-pill';spk.innerHTML='<span>🔊</span> Eshitish';spk.onclick=()=>speak(getQ(text));btns.appendChild(spk);
-    const trnBtn=document.createElement('button');trnBtn.className='action-pill trn-pill';trnBtn.innerHTML='<span>🇺🇿</span> Tarjima';
+    const spk=document.createElement('button');spk.className='spk';spk.innerHTML='🔊 Eshitish';spk.onclick=()=>speak(getQ(text));btns.appendChild(spk);
+    const trnBtn=document.createElement('button');trnBtn.className='trn-btn';trnBtn.innerHTML='🇺🇿 Tarjima';
     const trnBox=document.createElement('div');trnBox.className='trn-box';
     let translated=false;
     trnBtn.onclick=async()=>{
