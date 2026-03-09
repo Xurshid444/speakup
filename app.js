@@ -36,11 +36,11 @@
 })();
 
 // ════════════════════════════
-// INIT — Boshlash tugmasi
+// INIT — To'g'ridan app-screen ochish
 // ════════════════════════════
-$('start-btn').addEventListener('click',()=>{
+(function initApp(){
   $('lvl-badge').textContent=S.level;
-  $('setup-screen').classList.remove('active');
+  const ss=$('setup-screen');if(ss)ss.classList.remove('active');
   $('app-screen').classList.add('active');
   switchTab('home');
   initVoicePicker();
@@ -57,7 +57,7 @@ $('start-btn').addEventListener('click',()=>{
   updateTtsIndicator();
   renderGroqUsage();
   if(S.elKey){ loadElInfo(); setTimeout(loadElVoices,600); }
-});
+})();
 
 $('logout-btn').addEventListener('click',()=>{ if(confirm('Chiqasizmi?'))location.reload(); });
 

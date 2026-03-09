@@ -3,27 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SpeakUp — Navigate A1</title>
+<title>tilli — AI bilan ingliz tili</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="main.css?v=1773074000">
 </head>
 <body>
 
-  <div class="sw">
-    <div class="logo">🎙 SpeakUp</div>
-    <div class="tagline">Navigate A1 bilan inglizcha gaplashni o'rgan</div>
-    <div class="card">
-      <h2>Xush kelibsiz! 👋</h2>
-      <p>AI ustoz bilan inglizcha gaplashing, so'zlarni o'rganing va mashq qiling. Boshlash uchun hech narsa talab qilinmaydi — faqat bir tugma!</p>
-      <div style="display:flex;flex-direction:column;gap:10px;margin:16px 0 4px;">
-        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="font-size:20px;">📚</span> Navigate A1 darslari bilan o'rgan</div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="font-size:20px;">🎤</span> AI ustoz bilan ovozli suhbat</div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);"><span style="font-size:20px;">✍️</span> Spelling, Vocabulary, Grammar mashqlari</div>
-      </div>
-      <button class="btn btn-g" id="start-btn" style="margin-top:18px;">▶ Boshlash</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- GROQ KEY MODAL -->
 <div id="key-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);z-index:9998;align-items:center;justify-content:center;padding:20px;">
@@ -40,9 +26,9 @@
   </div>
 </div>
 
-<div id="app-screen" class="screen" style="flex-direction:column;">
+<div id="app-screen" class="screen active" style="flex-direction:column;">
   <div class="app-bar">
-    <div class="app-logo" id="home-logo-btn" style="cursor:pointer;" title="Bosh sahifa">🎙 SpeakUp</div>
+    <div class="app-logo" id="home-logo-btn" style="cursor:pointer;" title="Bosh sahifa"><svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px;"><rect width="40" height="40" rx="10" fill="#6C3CE1"/><path d="M8 10 Q8 6 12 6 L28 6 Q32 6 32 10 L32 24 Q32 28 28 28 L18 28 L12 34 L12 28 Q8 28 8 24 Z" fill="white" opacity="0.95"/><circle cx="27" cy="8" r="3" fill="#00D4AA"/></svg><span style="font-family:Georgia,serif;font-weight:bold;background:linear-gradient(135deg,#6C3CE1,#A855F7,#00D4AA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:19px;">tilli</span></div>
     <div class="hright">
       <div class="badge" id="lvl-badge">A1</div>
       <button id="theme-toggle-btn" class="icon-btn" title="Mavzu o'zgartirish" style="background:var(--s2);border:1px solid var(--border);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;">
