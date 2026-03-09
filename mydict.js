@@ -85,21 +85,27 @@ function mydRenderPackets(){
   wrap.innerHTML = '';
   if(packets.length === 0) return;
 
+  var grid = document.createElement('div');
+  grid.className = 'myd-packet-grid';
+  wrap.appendChild(grid);
+
   packets.forEach(function(pkt, idx){
-    var div = document.createElement('div');
-    div.className = 'myd-packet';
-    var preview = pkt.words.slice(0,4).map(function(w){ return w.en; }).join(', ') + (pkt.words.length>4?'...':'');
-    div.innerHTML =
-      '<div class="myd-packet-icon">📦</div>' +
-      '<div class="myd-packet-body">' +
-        '<div class="myd-packet-name">'+pkt.name+'</div>' +
-        '<div class="myd-packet-meta">'+pkt.words.length+' ta so\'z</div>' +
-        '<div class="myd-packet-words">'+preview+'</div>' +
+    var card = document.createElement('div');
+    card.className = 'myd-packet-card';
+    card.setAttribute('tabindex','0');
+    var preview = pkt.words.slice(0,3).map(function(w){ return w.en; }).join(', ') + (pkt.words.length>3?'...':'');
+    card.innerHTML =
+      '<div class="myd-pk-card-top">' +
+        '<div class="myd-pk-card-icon">\u{1F4E6}</div>' +
+        '<div class="myd-pk-card-num">#'+(idx+1)+'</div>' +
       '</div>' +
-      '<div class="myd-packet-actions">' +
-        '<button class="myd-pk-play" onclick="startMydGame('+idx+')">▶ Boshlash</button>' +
-      '</div>';
-    wrap.appendChild(div);
+      '<div class="myd-pk-card-name">'+pkt.name+'</div>' +
+      '<div class="myd-pk-card-meta">'+pkt.words.length+' ta so\'z</div>' +
+      '<div class="myd-pk-card-words">'+preview+'</div>' +
+      '<button class="myd-pk-card-btn" onclick="event.stopPropagation();startMydGame('+idx+')">&#9654; Boshlash</button>';
+    card.addEventListener('click', function(){ startMydGame(idx); });
+    card.addEventListener('keydown', function(e){ if(e.key==='Enter') startMydGame(idx); });
+    grid.appendChild(card);
   });
 }
 
