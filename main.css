@@ -983,3 +983,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 @media (max-width: 360px) {
   .myd-packet-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
 }
+
+/* ── Mic playback button ── */
+.play-rec-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;
+  font-family:'Helvetica Neue',sans-serif;cursor:pointer;border:none;
+  background:rgba(108,60,225,.15);border:1.5px solid rgba(108,60,225,.3);
+  color:var(--purple-light);transition:all .16s;
+}
+.play-rec-btn:hover{background:rgba(108,60,225,.25);transform:scale(1.03);}
+.play-rec-btn:disabled{opacity:.5;cursor:default;}

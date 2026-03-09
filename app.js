@@ -46,8 +46,8 @@ $('start-btn').addEventListener('click',()=>{
   initVoicePicker();
   reqMic();
   renderBookUnits();
-  makeMic({idle:'bi',recst:'br',rev:'bv',rec:'brec',stop:'bstop',del:'bdel',snd:'bsnd',tbox:'tb-book',wave:'wv-book',onSend:(text)=>sendBook(text)});
-  makeMic({idle:'fi',recst:'fr',rev:'fv',rec:'frec',stop:'fstop',del:'fdel',snd:'fsnd',tbox:'tb-free',wave:'wv-free',onSend:(text)=>sendFree(text)});
+  makeMic({idle:'bi',recst:'br',rev:'bv',rec:'brec',stop:'bstop',del:'bdel',snd:'bsnd',play:'bplay',tbox:'tb-book',wave:'wv-book',onSend:(text)=>sendBook(text)});
+  makeMic({idle:'fi',recst:'fr',rev:'fv',rec:'frec',stop:'fstop',del:'fdel',snd:'fsnd',play:'fplay',tbox:'tb-free',wave:'wv-free',onSend:(text)=>sendFree(text)});
   renderVocUnits();
   renderSpellUnits();
   makeExUnitGrid('mcq-unit-grid',startMcq,'mcq-lessons','mcq-unit-head','mcq-unit-sub','mcq-lesson-list','mcq-units');

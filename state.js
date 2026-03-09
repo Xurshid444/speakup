@@ -201,18 +201,18 @@ async function getStream(){
 }
 function makeMic(cfg){
   const idle=$(cfg.idle),recst=$(cfg.recst),rev=$(cfg.rev);
-  const recBtn=$(cfg.rec),stopBtn=$(cfg.stop),delBtn=$(cfg.del),sndBtn=$(cfg.snd);
+  const recBtn=$(cfg.rec),stopBtn=$(cfg.stop),delBtn=$(cfg.del),sndBtn=$(cfg.snd),playBtn=cfg.play?$(cfg.play):null;
   const tbox=$(cfg.tbox),wave=$(cfg.wave);let mr=null,chunks=[],ablob=null;
   const setStatus=(txt,on=false)=>{if(!tbox)return;tbox.textContent=txt;tbox.classList.toggle('on',on);};
   const showI=()=>{idle.style.display='flex';recst.style.display='none';rev.style.display='none';wave.classList.remove('show');setStatus('Bosib gapiring...',false);};
   const showR=()=>{idle.style.display='none';recst.style.display='flex';rev.style.display='none';wave.classList.add('show');};
-  const showV=()=>{idle.style.display='none';recst.style.display='none';rev.style.display='flex';wave.classList.remove('show');};
+  const showV=()=>{idle.style.display='none';recst.style.display='none';rev.style.display='flex';wave.classList.remove('show');if(playBtn){playBtn.onclick=()=>{if(ablob){const u=URL.createObjectURL(ablob);const pa=new Audio(u);pa.play();playBtn.disabled=true;pa.onended=()=>{playBtn.disabled=false;};}};}else if(rev.querySelector('.play-rec-btn')){const pb=rev.querySelector('.play-rec-btn');pb.onclick=()=>{if(ablob){const u=URL.createObjectURL(ablob);const pa=new Audio(u);pa.play();}};}};
   async function startRec(){
     window.speechSynthesis.cancel();if(curAudio){curAudio.pause();curAudio=null;}chunks=[];ablob=null;setStatus('🔴 Yozilmoqda...',true);showR();
     let stream;try{stream=await getStream();}catch(e){showMicPermissionError();showI();return;}
     const fmts=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4'];const fmt=fmts.find(f=>MediaRecorder.isTypeSupported(f))||'';
     mr=new MediaRecorder(stream,fmt?{mimeType:fmt}:{});mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
-    mr.onstop=()=>{ablob=new Blob(chunks,{type:mr.mimeType||'audio/webm'});URL.createObjectURL(ablob);setStatus('✅ Yozildi — eshiting yoki yuboring',true);showV();};
+    mr.onstop=()=>{ablob=new Blob(chunks,{type:mr.mimeType||'audio/webm'});setStatus('✅ Yozildi — eshiting yoki yuboring',true);showV();};
     mr.start(250);
   }
   recBtn.addEventListener('click',startRec);stopBtn.addEventListener('click',()=>{if(mr&&mr.state!=='inactive')mr.stop();});
