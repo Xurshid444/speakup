@@ -552,7 +552,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .sp-action-row{display:flex;flex-direction:row;gap:12px;justify-content:center;margin-top:16px;width:100%;max-width:520px;margin-left:auto;margin-right:auto;}
 
 /* Spelling skip button */
-#sp-skip-btn{background:var(--adim);border:1.5px solid rgba(0,212,170,.5);color:var(--accent);padding:14px 28px;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Helvetica Neue',sans-serif;transition:all .18s;display:inline-flex;align-items:center;gap:8px;flex:1;justify-content:center;}
+#sp-skip-btn{background:var(--adim);border:1.5px solid rgba(0,212,170,.5);color:var(--accent);padding:14px 20px;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Helvetica Neue',sans-serif;transition:all .18s;display:inline-flex;align-items:center;gap:8px;flex:1;justify-content:center;white-space:nowrap;}
 #sp-skip-btn:hover{background:rgba(0,229,176,.2);}
 
 .myd-btn-skip{display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 10px;border-radius:14px;background:var(--adim);border:1.5px solid rgba(0,229,176,.5);color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap;}
