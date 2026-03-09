@@ -570,38 +570,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 .bn-more-item:active{background:var(--pdim);border-color:var(--purple);color:var(--purple-light);}
 
-/* ══════════════════════════════════════════
-   KLAVIATURA OCHILGANDA — mobile
-   ══════════════════════════════════════════ */
-@media(max-width:600px){
-  /* App bar va bottom nav yashiriladi */
-  body.keyboard-open .app-bar  { display:none !important; }
-  body.keyboard-open .bottom-nav { display:none !important; }
 
-  /* Spelling — karta tepada qolsin */
-  body.keyboard-open #sp-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 12px;
-  }
-  body.keyboard-open .sp-word-bar {
-    margin-bottom: 12px;
-  }
-
-  /* Fill type — karta ko'rinsin */
-  body.keyboard-open #ft-game {
-    padding-top: 8px;
-  }
-
-  /* Mydict — karta ko'rinsin */
-  body.keyboard-open #myd-game {
-    padding-top: 8px;
-  }
-}
 
 /* ══════════════════════════════════════════
-   BOTTOM NAV — 2 qatorli, barcha tablar
+   BOTTOM NAV — horizontal scroll, 1 qator
    ══════════════════════════════════════════ */
 .bottom-nav { display: none; }
 
@@ -610,61 +582,60 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
   .bottom-nav {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     position: fixed;
     bottom: 0; left: 0; right: 0;
     background: rgba(15,10,31,.97);
     border-top: 1px solid rgba(108,60,225,.2);
-    padding-bottom: env(safe-area-inset-bottom, 6px);
+    padding: 0 0 env(safe-area-inset-bottom, 4px);
     z-index: 200;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .bottom-nav::-webkit-scrollbar { display: none; }
 
+  /* bn-row: ikkala qator ham flex row */
   .bn-row {
-    display: flex;
-    width: 100%;
-  }
-
-  .bn-row1 {
-    border-bottom: 1px solid rgba(108,60,225,.1);
+    display: contents;
   }
 
   .bn-item {
-    flex: 1;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
-    padding: 6px 2px 5px;
+    padding: 8px 10px 6px;
     cursor: pointer;
     border: none;
     background: transparent;
     color: var(--text3);
-    font-size: 7.5px;
+    font-size: 9px;
     font-weight: 600;
     font-family: 'Inter', sans-serif;
     transition: color .15s;
     -webkit-tap-highlight-color: transparent;
-    min-width: 0;
+    white-space: nowrap;
+    min-width: 56px;
   }
 
   .bn-item.on { color: var(--purple-light); }
 
   .bn-item svg {
-    width: 18px; height: 18px;
+    width: 20px; height: 20px;
     flex-shrink: 0;
   }
 
   .bn-item span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+    display: block;
     text-align: center;
   }
 
-  .app-body { padding-bottom: 110px !important; }
+  .app-body { padding-bottom: 72px !important; }
 
   /* Klaviatura ochilganda nav yashirish */
   body.keyboard-open .app-bar    { display: none !important; }
