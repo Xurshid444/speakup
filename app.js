@@ -4,28 +4,32 @@
 // ═══════════════════════════════════════════════════
 (function(){
   if(!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
-  
-  const THRESHOLD = 150; // px
-  const initialHeight = window.innerHeight;
-  
+  const THRESHOLD = 150;
+  let baseHeight = window.innerHeight;
+
+  // Orientatsiya o'zgarganda base yangilash
+  window.addEventListener('orientationchange', function(){
+    setTimeout(function(){ baseHeight = window.innerHeight; }, 300);
+  });
+
   window.addEventListener('resize', function(){
-    const currentHeight = window.innerHeight;
-    const diff = initialHeight - currentHeight;
+    const h = window.innerHeight;
+    const diff = baseHeight - h;
     if(diff > THRESHOLD){
-      // Klaviatura ochildi
       document.body.classList.add('keyboard-open');
-      // Faol inputni scroll qilib ko'rsatish
+      // Faol kontent ko'rinib tursin
       setTimeout(function(){
-        const active = document.activeElement;
-        if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')){
-          active.scrollIntoView({behavior:'smooth', block:'center'});
-        }
-        // Spelling/mydict — sp-row ko'rsatish
-        const spRow = document.querySelector('.sp-row');
-        if(spRow) spRow.scrollIntoView({behavior:'smooth', block:'center'});
-      }, 100);
+        // Spelling kataklar
+        const spLetters = document.getElementById('sp-letters');
+        if(spLetters){ spLetters.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+        // Mydict kataklar
+        const mydLetters = document.getElementById('myd-sp-letters');
+        if(mydLetters){ mydLetters.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+        // Fill type
+        const ftCard = document.querySelector('.ex-card');
+        if(ftCard){ ftCard.scrollIntoView({behavior:'smooth', block:'start'}); }
+      }, 200);
     } else {
-      // Klaviatura yopildi
       document.body.classList.remove('keyboard-open');
     }
   });
@@ -299,21 +303,28 @@ function bnSet(tab){
   const btn=document.querySelector(`.bn-item[data-tab="${tab}"]`);
   if(btn){ btn.classList.add('on'); }
   else {
-    // more menu dagi tab — "Ko'proq" tugmasini yoqamiz
-    const moreBtn=document.querySelector('.bn-item[data-tab="more"]');
+    // Sheet ichidagi tab (filltype, wordorder, free, settings)
+    // "Mashqlar" tugmasini highlight qilamiz
+    const moreBtn=document.querySelector('.bn-item[data-tab="mcq"]');
     if(moreBtn) moreBtn.classList.add('on');
   }
 }
 function toggleMoreMenu(){
   const m=document.getElementById('more-menu');
+  const ov=document.getElementById('more-overlay');
   if(m.classList.contains('open')){
     m.classList.remove('open');
+    if(ov) ov.classList.remove('open');
   } else {
     m.classList.add('open');
+    if(ov) ov.classList.add('open');
   }
 }
 function closeMore(){
-  document.getElementById('more-menu').classList.remove('open');
+  const m=document.getElementById('more-menu');
+  const ov=document.getElementById('more-overlay');
+  if(m) m.classList.remove('open');
+  if(ov) ov.classList.remove('open');
 }
 // More menu tashqarisiga bosish — yopish (legacy)
 document.addEventListener('click',function(e){
@@ -323,11 +334,16 @@ document.addEventListener('click',function(e){
   }
 });
 // Bottom nav tab bosish
-document.querySelectorAll('.bn-item:not([data-tab="more"])').forEach(tab=>{
+document.querySelectorAll('.bn-item').forEach(tab=>{
   tab.addEventListener('click',()=>{
-    switchTab(tab.dataset.tab);
-    bnSet(tab.dataset.tab);
-    closeMore();
+    if(tab.dataset.tab === 'mcq'){
+      // "Mashqlar" — sheet ochish
+      toggleMoreMenu();
+    } else {
+      switchTab(tab.dataset.tab);
+      bnSet(tab.dataset.tab);
+      closeMore();
+    }
   });
 });
 

@@ -252,7 +252,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .sp-box.hint{border-color:var(--gold);color:var(--gold);}
 @keyframes pop{0%{transform:scale(.8);}60%{transform:scale(1.15);}100%{transform:scale(1);}}
 @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}
-.sp-input{position:absolute;opacity:0;width:1px;height:1px;top:0;left:0;pointer-events:none;direction:ltr !important;text-align:left !important;unicode-bidi:bidi-override;writing-mode:horizontal-tb;caret-color:transparent;color:transparent;-webkit-text-security:none;}
+.sp-input{position:fixed;top:-120px;left:0;width:100%;height:40px;opacity:0;pointer-events:none;direction:ltr;text-align:left;unicode-bidi:normal;caret-color:transparent;color:transparent;font-size:16px;border:none;outline:none;background:transparent;z-index:-1;}
 .sp-input:focus{border-color:var(--accent);}
 .sp-feedback{text-align:center;max-width:500px;width:100%;margin:0 auto;width:100%;max-width:460px;padding:12px 16px;border-radius:var(--r);font-size:14px;font-weight:600;text-align:center;display:none;}
 .sp-feedback.correct{background:var(--gndim);border:1px solid rgba(74,222,128,.25);color:var(--green);}
@@ -461,9 +461,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   body.keyboard-open .bottom-nav { display:none !important; }
 }
 
-.bn-more-item{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--s2);border:1px solid var(--border);border-radius:14px;color:var(--text);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;flex:1;min-width:calc(50% - 5px);}
+
 .bn-more-item:active{background:var(--adim);border-color:var(--accent);color:var(--accent);}
-#more-menu{display:none !important;}
+
 
 #bv-chat, #fv-chat, #free-chat-wrap { flex-direction: column; }
 
@@ -589,7 +589,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   box-shadow:0 -8px 32px rgba(0,0,0,.4);
 }
 #more-menu.open{display:flex !important;}
-.bn-more-item{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--s2);border:1px solid var(--border);border-radius:14px;color:var(--text);font-size:14px;font-weight:600;font-family:'Helvetica Neue',sans-serif;cursor:pointer;flex:1;min-width:calc(50% - 5px);}
+
 .bn-more-item:active{background:var(--pdim);border-color:var(--purple);color:var(--purple-light);}
 
 /* ═══ MOBILE FIXES ═══ */
@@ -1020,41 +1020,111 @@ html { font-size: var(--fs-base, 24px); }
 .fill-input.correct { border-color: var(--green); }
 .fill-input.wrong   { border-color: var(--red); }
 
-/* ── Klaviatura ochilganda: kontent yuqoriga ── */
+
+/* ══════════════════════════════════════════
+   MASHQLAR SHEET — bottom sheet style
+   ══════════════════════════════════════════ */
+#more-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 210;
+  backdrop-filter: blur(2px);
+}
+#more-overlay.open { display: block; }
+
+.more-sheet {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--s1);
+  border-radius: 24px 24px 0 0;
+  padding: 12px 20px 40px;
+  z-index: 220;
+  border-top: 1px solid rgba(108,60,225,.25);
+  box-shadow: 0 -8px 40px rgba(0,0,0,.4);
+  animation: sheet-up .22s cubic-bezier(.32,.72,0,1);
+}
+.more-sheet.open { display: block; }
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.more-sheet-handle {
+  width: 40px; height: 4px;
+  background: var(--border2);
+  border-radius: 4px;
+  margin: 0 auto 16px;
+}
+.more-sheet-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 14px;
+  text-align: center;
+}
+.more-sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.more-sheet-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 8px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Helvetica Neue', sans-serif;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.more-sheet-btn svg {
+  width: 24px; height: 24px;
+  stroke: var(--purple-light);
+}
+.more-sheet-btn:active {
+  background: var(--pdim);
+  border-color: var(--purple);
+}
+
+/* ══════════════════════════════════════════
+   KLAVIATURA OCHILGANDA — mobile
+   ══════════════════════════════════════════ */
 @media(max-width:600px){
-  /* Spelling klaviatura ochilganda kart ko'rinsin */
-  body.keyboard-open .sp-word-bar {
-    position: fixed;
-    top: 10px;
-    left: 0; right: 0;
-    z-index: 150;
-    background: var(--bg);
-    padding: 12px;
-    border-bottom: 1px solid var(--border);
-  }
+  /* App bar va bottom nav yashiriladi */
+  body.keyboard-open .app-bar  { display:none !important; }
+  body.keyboard-open .bottom-nav { display:none !important; }
+
+  /* Spelling — karta tepada qolsin */
   body.keyboard-open #sp-wrap {
-    padding-top: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 12px;
   }
-  /* Fill type klaviatura ochilganda */
-  body.keyboard-open .ex-card {
-    position: fixed;
-    top: 8px;
-    left: 12px; right: 12px;
-    z-index: 150;
-    background: var(--s1);
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  body.keyboard-open .sp-word-bar {
+    margin-bottom: 12px;
   }
-  /* Mydict klaviatura ochilganda */
-  body.keyboard-open #myd-sp-wrap {
-    position: fixed;
-    top: 8px;
-    left: 12px; right: 12px;
-    z-index: 150;
-    background: var(--s1);
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+
+  /* Fill type — karta ko'rinsin */
+  body.keyboard-open #ft-game {
+    padding-top: 8px;
+  }
+
+  /* Mydict — karta ko'rinsin */
+  body.keyboard-open #myd-game {
+    padding-top: 8px;
   }
 }
