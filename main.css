@@ -437,29 +437,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* BOTTOM NAV — mobile only */
 .bottom-nav{display:none;}
-@media(max-width:600px){
-  .bottom-nav{
-    display:flex;position:fixed;bottom:0;left:0;right:0;
-    background:rgba(15,10,31,.97);border-top:1px solid rgba(108,60,225,.2);
-    padding:6px 0 env(safe-area-inset-bottom, 8px);z-index:200;gap:0;
-    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  }
-  .bn-item{
-    flex:1;display:flex;flex-direction:column;align-items:center;
-    gap:2px;padding:5px 1px;cursor:pointer;border:none;background:transparent;
-    color:var(--text3);font-size:8px;font-weight:600;font-family:'Inter',sans-serif;
-    transition:color .18s;letter-spacing:.01em;min-width:0;
-  }
-  .bn-item.on{color:var(--purple-light);}
-  .bn-item svg{width:19px;height:19px;flex-shrink:0;}
-  .bn-item span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48px;text-align:center;}
-  .app-body{padding-bottom:70px !important;}
-  .tabs-wrap{display:none;}
 
-  /* ── Klaviatura ochilganda app-bar yashirish ── */
-  body.keyboard-open .app-bar { display:none !important; }
-  body.keyboard-open .bottom-nav { display:none !important; }
-}
 
 
 .bn-more-item:active{background:var(--adim);border-color:var(--accent);color:var(--accent);}
@@ -592,513 +570,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 .bn-more-item:active{background:var(--pdim);border-color:var(--purple);color:var(--purple-light);}
 
-/* ═══ MOBILE FIXES ═══ */
-
-/* Barcha sub-view lar uchun background */
-#sv-units,#sv-lessons,#sv-game,#sv-score,
-#vv-units,#vv-lessons,#vv-test,#vv-score,
-#bv-units,#bv-lessons,#bv-chat,
-#mcq-units,#mcq-lessons,#mcq-game,#mcq-score,
-#ft-units,#ft-lessons,#ft-game,#ft-score,
-#wo-units,#wo-lessons,#wo-game,#wo-done,
-#myd-home,#myd-game,#myd-score,
-#free-panel,#settings-panel,#home-panel{
-  background:var(--bg);
-}
-
-/* Keyboard açilganda scroll fix */
-@supports (height: 100dvh) {
-  html, body { min-height: 100dvh; }
-  .screen.active { min-height: 100dvh; }
-  #app-screen { min-height: 100dvh; }
-}
-
-/* Input always LTR */
-input[type="text"], input:not([type]), textarea {
-  direction: ltr !important;
-  text-align: left !important;
-  unicode-bidi: plaintext;
-}
-
-/* Spelling va MYD input overflow fix */
-#sp-input, #myd-sp-input {
-  direction: ltr !important;
-  text-align: left !important;
-}
-
-/* More menu overlay */
-#more-menu::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-}
-
-/* Tab bar tap highlight olib tashlash */
-.tab, .bn-item, .bn-more-item, .opt-btn, .word-chip {
-  -webkit-tap-highlight-color: transparent;
-  tap-highlight-color: transparent;
-}
-
-/* Klaviatura paytida panel scroll */
-.panel.on {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Harf kiritish maydonlari ustida yetarli bo'sh joy */
-@media (max-width: 600px) {
-  #sv-game, #myd-game {
-    padding-bottom: 120px;
-  }
-  /* Score va game screens full background */
-  #sv-score, #myd-score, #vv-score,
-  #mcq-score, #ft-score, #wo-done {
-    background: var(--bg) !important;
-    min-height: 100%;
-  }
-}
-
-/* ═══════════════════════════════════════════
-   TILLI — YANGI KOMPONENTLAR
-   ═══════════════════════════════════════════ */
-
-/* ── Eshitish / Tarjima tugmalar — bir xil ── */
-.action-pill {
-  display:inline-flex; align-items:center; gap:6px;
-  padding:7px 16px; border-radius:20px;
-  font-size:13px; font-weight:600; cursor:pointer;
-  font-family:'Helvetica Neue',sans-serif;
-  border:none; transition:all .18s;
-  white-space:nowrap;
-}
-.spk-pill {
-  background:var(--adim);
-  border:1px solid rgba(0,212,170,.25);
-  color:var(--accent);
-}
-.spk-pill:hover { background:rgba(0,212,170,.2); }
-.trn-pill {
-  background:var(--pdim);
-  border:1px solid rgba(108,60,225,.3);
-  color:var(--purple-light);
-}
-.trn-pill:hover { background:rgba(108,60,225,.18); }
-
-/* ── SP-BOX cursor animatsiyasi ── */
-
-  50%      { box-shadow: 0 0 0 4px rgba(108,60,225,.4); border-color: var(--purple-light); }
-
-/* ── MCQ variantlar — rangli ── */
-.opt-a { border-color: rgba(108,60,225,.35) !important; }
-.opt-a .opt-letter { background:rgba(108,60,225,.25); border-color:rgba(108,60,225,.4); color:#A855F7; }
-.opt-a:hover:not(:disabled) { border-color:#6C3CE1 !important; background:rgba(108,60,225,.1) !important; }
-
-.opt-b { border-color: rgba(0,212,170,.35) !important; }
-.opt-b .opt-letter { background:rgba(0,212,170,.2); border-color:rgba(0,212,170,.4); color:var(--accent); }
-.opt-b:hover:not(:disabled) { border-color:#00D4AA !important; background:rgba(0,212,170,.1) !important; }
-
-.opt-c { border-color: rgba(255,107,53,.35) !important; }
-.opt-c .opt-letter { background:rgba(255,107,53,.2); border-color:rgba(255,107,53,.4); color:var(--orange); }
-.opt-c:hover:not(:disabled) { border-color:#FF6B35 !important; background:rgba(255,107,53,.1) !important; }
-
-.opt-d { border-color: rgba(255,209,102,.35) !important; }
-.opt-d .opt-letter { background:rgba(255,209,102,.2); border-color:rgba(255,209,102,.4); color:var(--gold); }
-.opt-d:hover:not(:disabled) { border-color:#ffd166 !important; background:rgba(255,209,102,.1) !important; }
-
-.opt-btn { font-size:16px; font-weight:600; }
-
-/* ── Progress bar — ko'rinadigan, alohida ── */
-.ex-progress-bar-wrap {
-  width:100%; max-width:580px;
-  background:var(--s2);
-  border-radius:16px;
-  padding:10px 16px 14px;
-  border:1px solid var(--border);
-  margin-bottom:16px;
-}
-.ex-top-row {
-  display:flex; justify-content:space-between; align-items:center;
-  margin-bottom:8px;
-}
-.ex-prog-label {
-  font-size:14px; font-weight:700; color:var(--text);
-}
-.ex-score-label {
-  font-size:13px; font-weight:700; color:var(--accent);
-}
-.ex-progress-bar {
-  height:8px; background:var(--s3); border-radius:6px; overflow:hidden;
-}
-.ex-progress-fill {
-  height:100%; border-radius:6px; transition:width .4s ease;
-  background:linear-gradient(90deg,var(--purple),var(--purple-light));
-}
-
-/* ── Word Order action row ── */
-.wo-action-row {
-  display:flex; gap:12px; width:100%; max-width:520px;
-  padding:4px 0 8px;
-}
-.wo-clear-btn-new {
-  flex:1; padding:13px 16px; border-radius:14px;
-  background:var(--s2); border:1.5px solid var(--border2);
-  color:var(--text2); font-size:14px; font-weight:600;
-  font-family:'Helvetica Neue',sans-serif; cursor:pointer;
-  transition:all .18s; display:flex; align-items:center;
-  justify-content:center; gap:6px;
-}
-.wo-clear-btn-new:hover { background:var(--s3); border-color:var(--border2); color:var(--text); }
-.wo-check-btn {
-  flex:2; padding:13px 20px; border-radius:14px;
-  background:linear-gradient(135deg,var(--purple),var(--purple-light));
-  border:none; color:#fff; font-size:15px; font-weight:700;
-  font-family:'Helvetica Neue',sans-serif; cursor:pointer;
-  transition:all .18s; display:flex; align-items:center;
-  justify-content:center; gap:7px;
-  box-shadow:0 4px 16px var(--pglow);
-}
-.wo-check-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px var(--pglow); }
-
-/* ── Font size haqiqatda katta ── */
-html { font-size: var(--fs-base, 24px); }
-.bubble { font-size: 1rem; }
-.ex-sentence { font-size: calc(1rem + 4px); }
-.vc-word { font-size: calc(1.6rem + 2px) !important; }
-.opt-btn { font-size: calc(0.85rem + 2px); }
-.word-chip { font-size: calc(0.85rem + 2px); }
-
-/* ── App bar logo kattaroq ── */
-.app-logo svg { display:block; }
-.app-bar { padding:10px 20px; }
-
-/* ── Setup screen logo ── */
-.logo svg { filter: drop-shadow(0 4px 12px rgba(108,60,225,.3)); }
-
-/* ═══════════════════════════════════════════
-   TUZATISHLAR — YANGI QISM
-   ═══════════════════════════════════════════ */
-
-/* ── SP-CURSOR — katak ichida qimirlab turadigan kursor ── */
-
-
-/* ── MCQ opt ranglari kuchaytirish ── */
-.opt-a { 
-  border-color: rgba(108,60,225,.5) !important;
-  background: rgba(108,60,225,.06) !important;
-}
-.opt-a .opt-letter { 
-  background: rgba(108,60,225,.3); 
-  border-color: rgba(108,60,225,.5); 
-  color: #B794F4; 
-  font-weight:800;
-}
-.opt-a:hover:not(:disabled) { 
-  background: rgba(108,60,225,.15) !important; 
-  border-color: var(--purple) !important;
-  transform: translateY(-2px);
-}
-
-.opt-b { 
-  border-color: rgba(0,212,170,.5) !important;
-  background: rgba(0,212,170,.06) !important;
-}
-.opt-b .opt-letter { 
-  background: rgba(0,212,170,.25); 
-  border-color: rgba(0,212,170,.5); 
-  color: #2DD4BF;
-  font-weight:800;
-}
-.opt-b:hover:not(:disabled) { 
-  background: rgba(0,212,170,.15) !important; 
-  border-color: var(--accent) !important;
-  transform: translateY(-2px);
-}
-
-.opt-c { 
-  border-color: rgba(255,107,53,.5) !important;
-  background: rgba(255,107,53,.06) !important;
-}
-.opt-c .opt-letter { 
-  background: rgba(255,107,53,.25); 
-  border-color: rgba(255,107,53,.5); 
-  color: #FB923C;
-  font-weight:800;
-}
-.opt-c:hover:not(:disabled) { 
-  background: rgba(255,107,53,.15) !important; 
-  border-color: var(--orange) !important;
-  transform: translateY(-2px);
-}
-
-.opt-d { 
-  border-color: rgba(255,209,102,.5) !important;
-  background: rgba(255,209,102,.06) !important;
-}
-.opt-d .opt-letter { 
-  background: rgba(255,209,102,.25); 
-  border-color: rgba(255,209,102,.5); 
-  color: #FBBF24;
-  font-weight:800;
-}
-.opt-d:hover:not(:disabled) { 
-  background: rgba(255,209,102,.15) !important; 
-  border-color: #ffd166 !important;
-  transform: translateY(-2px);
-}
-
-/* ── HOME CARDS — overflow fix ── */
-.home-cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  width: 100%;
-}
-@media (min-width: 600px) {
-  .home-cards { grid-template-columns: repeat(3, 1fr); }
-}
-.home-card {
-  overflow: hidden;
-}
-/* Lug'atim card — to'liq kenglikda pastda */
-.home-cards .home-card:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-}
-
-/* ── SP-WRAP — emoji katta, chiroyli ── */
-.sp-emoji-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 160px;
-}
-.sp-emoji-box > span {
-  font-size: 72px;
-  line-height: 1;
-}
-
-/* ── SP-BOX ichida vertikal kursor (cursor bar) ── */
-
-
-
-/* Agar katak bo'sh bo'lsa kursor ko'rinsin, harf kiritilsa yo'qolsin */
-
-/* ── FILL TYPE — kursor o'rtada, qimirlab tursin ── */
-
-/* Caret animation — fill-input ichida */
-
-
-
-/* ── Fill Type input — kursor o'rtada ── */
-
-
-/* ═══════════════════════════════════════
-   SP-BOX KURSOR — katak ichida | chiziq
-   ═══════════════════════════════════════ */
-
-/* Active katak — border highlighted, qimirlamaydi */
-
-/* Kursor chiziq — faqat bo'sh active katakda */
-
-/* Harf kiritilganda kursor yo'qoladi */
-
-/* ── Katak ichida | kursor — faqat ::after qimirlaydi ── */
-@keyframes bar-blink {
-  0%,49%  { opacity:1; }
-  50%,100%{ opacity:0; }
-}
-.sp-box.sp-cursor {
-  border-color: var(--purple) !important;
-  background: var(--pdim) !important;
-  position: relative;
-  /* animation YO'Q — katak o'zi qimirlamaydi */
-}
-.sp-box.sp-cursor::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 16%;
-  width: 2px;
-  height: 68%;
-  transform: translateX(-50%);
-  background: var(--purple-light);
-  border-radius: 2px;
-  animation: bar-blink 1s step-end infinite;
-  pointer-events: none;
-  display: block;
-}
-.sp-box.sp-cursor:not(:empty)::after {
-  display: none;
-}
-
-/* ═══════════════════════════════════════════════
-   FILL TYPE INPUT — kursor markazda
-   ═══════════════════════════════════════════════ */
-@keyframes ft-caret {
-  0%,49%  { caret-color: var(--purple-light); }
-  50%,100%{ caret-color: transparent; }
-}
-
-
-@media (max-width:600px) {
-  
-}
-
-
-/* ── Fill input wrapper — caret o'rtada ── */
-
-.fill-fake-placeholder {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--text3);
-  font-size: 20px;
-  font-family: 'Helvetica Neue', sans-serif;
-  pointer-events: none;
-  white-space: nowrap;
-}
-
-/* ════════════════════════════════════════
-   FILL TYPE — Fake Input (kursor o'rtada)
-   ════════════════════════════════════════ */
-
-
-
-
-
-
-
-
-
-/* Ko'rinadigan matn */
-
-
-/* Placeholder */
-
-
-/* Kursor — 
-  50%, 100% { opacity: 0; }
-
-
-
-
-/* Matn bor bo'lganda ham kursor ko'rinsin */
-
-
-/* has-text da placeholder yashirinadi */
-
-
-/* ── Fill Type — oddiy input ── */
-.fill-input {
-  width: 100%;
-  max-width: 380px;
-  display: block;
-  margin: 0 auto;
-  background: var(--s2);
-  border: 2px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 20px;
-  color: var(--text);
-  font-size: 20px;
-  font-family: 'Helvetica Neue', sans-serif;
-  outline: none;
-  transition: border-color .2s;
-  text-align: left;
-  direction: ltr;
-  caret-color: var(--purple-light);
-}
-.fill-input::placeholder {
-  color: var(--text3);
-  text-align: left;
-}
-.fill-input:focus {
-  border-color: var(--purple);
-  box-shadow: 0 0 0 3px rgba(108,60,225,.12);
-}
-.fill-input.correct { border-color: var(--green); }
-.fill-input.wrong   { border-color: var(--red); }
-
-
-/* ══════════════════════════════════════════
-   MASHQLAR SHEET — bottom sheet style
-   ══════════════════════════════════════════ */
-#more-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.5);
-  z-index: 210;
-  backdrop-filter: blur(2px);
-}
-#more-overlay.open { display: block; }
-
-.more-sheet {
-  display: none;
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: var(--s1);
-  border-radius: 24px 24px 0 0;
-  padding: 12px 20px 40px;
-  z-index: 220;
-  border-top: 1px solid rgba(108,60,225,.25);
-  box-shadow: 0 -8px 40px rgba(0,0,0,.4);
-  animation: sheet-up .22s cubic-bezier(.32,.72,0,1);
-}
-.more-sheet.open { display: block; }
-
-@keyframes sheet-up {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
-}
-
-.more-sheet-handle {
-  width: 40px; height: 4px;
-  background: var(--border2);
-  border-radius: 4px;
-  margin: 0 auto 16px;
-}
-.more-sheet-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  margin-bottom: 14px;
-  text-align: center;
-}
-.more-sheet-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-.more-sheet-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 8px;
-  background: var(--s2);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 600;
-  font-family: 'Helvetica Neue', sans-serif;
-  cursor: pointer;
-  transition: background .15s, border-color .15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.more-sheet-btn svg {
-  width: 24px; height: 24px;
-  stroke: var(--purple-light);
-}
-.more-sheet-btn:active {
-  background: var(--pdim);
-  border-color: var(--purple);
-}
-
 /* ══════════════════════════════════════════
    KLAVIATURA OCHILGANDA — mobile
    ══════════════════════════════════════════ */
@@ -1127,4 +598,75 @@ html { font-size: var(--fs-base, 24px); }
   body.keyboard-open #myd-game {
     padding-top: 8px;
   }
+}
+
+/* ══════════════════════════════════════════
+   BOTTOM NAV — 2 qatorli, barcha tablar
+   ══════════════════════════════════════════ */
+.bottom-nav { display: none; }
+
+@media(max-width:600px){
+  .tabs-wrap { display: none; }
+
+  .bottom-nav {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(15,10,31,.97);
+    border-top: 1px solid rgba(108,60,225,.2);
+    padding-bottom: env(safe-area-inset-bottom, 6px);
+    z-index: 200;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .bn-row {
+    display: flex;
+    width: 100%;
+  }
+
+  .bn-row1 {
+    border-bottom: 1px solid rgba(108,60,225,.1);
+  }
+
+  .bn-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 2px 5px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text3);
+    font-size: 7.5px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: color .15s;
+    -webkit-tap-highlight-color: transparent;
+    min-width: 0;
+  }
+
+  .bn-item.on { color: var(--purple-light); }
+
+  .bn-item svg {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+  }
+
+  .bn-item span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .app-body { padding-bottom: 110px !important; }
+
+  /* Klaviatura ochilganda nav yashirish */
+  body.keyboard-open .app-bar    { display: none !important; }
+  body.keyboard-open .bottom-nav { display: none !important; }
 }

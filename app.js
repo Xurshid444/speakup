@@ -301,13 +301,7 @@ function bindExNav(){
 function bnSet(tab){
   document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('on'));
   const btn=document.querySelector(`.bn-item[data-tab="${tab}"]`);
-  if(btn){ btn.classList.add('on'); }
-  else {
-    // Sheet ichidagi tab (filltype, wordorder, free, settings)
-    // "Mashqlar" tugmasini highlight qilamiz
-    const moreBtn=document.querySelector('.bn-item[data-tab="mcq"]');
-    if(moreBtn) moreBtn.classList.add('on');
-  }
+  if(btn) btn.classList.add('on');
 }
 function toggleMoreMenu(){
   const m=document.getElementById('more-menu');
@@ -336,14 +330,8 @@ document.addEventListener('click',function(e){
 // Bottom nav tab bosish
 document.querySelectorAll('.bn-item').forEach(tab=>{
   tab.addEventListener('click',()=>{
-    if(tab.dataset.tab === 'mcq'){
-      // "Mashqlar" — sheet ochish
-      toggleMoreMenu();
-    } else {
-      switchTab(tab.dataset.tab);
-      bnSet(tab.dataset.tab);
-      closeMore();
-    }
+    switchTab(tab.dataset.tab);
+    bnSet(tab.dataset.tab);
   });
 });
 
