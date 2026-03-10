@@ -352,3 +352,18 @@ Capital city/Poytaxt shahar
 Use/Ishlatmoq yoki foydalanmoq
 Too many/Juda ko'p (sanaladigan)
 Crowded/Gavjum yoki olomon
+I am on time for work/Men ishga vaqtida kelaman
+I am never late for work/Men hechqachon ishga kech qolmayman
+Custom service/Bojxona xizmati
+Rescue team/Qutqaruv jamoasi
+Border patrol/Chegara patruli
+Fight villains/Yomonlarga qarshi kurashmoq
+Prefer/Afzal ko'raman
+Noisy/Shovqinli
+Quiet/Tinch (sokin)
+Weather conditions/Ob-havo sharoiti
+I want to/Men hohlayman
+Me too/Men ham (menga ham)
+Only/Faqat
+A long/Yolg'iz
+Again/Yana
