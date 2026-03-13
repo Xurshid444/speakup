@@ -367,3 +367,30 @@ Me too/Men ham (menga ham)
 Only/Faqat
 A long/Yolg'iz
 Again/Yana
+Today/Bugun
+This week/Bu hafta
+This morning/Bu tongda
+This month/Bu oyda
+This year/Bu yili
+Feel/His qilmoq
+Now/Hozir
+Right now/Aynan hozir
+At the moment/Shu lahzada (shu onda)
+At present/Shu lahzada
+Currently/Hozirgi vaqtda
+Look/Qara (Qaragon)
+Listen/Eshit (Eshitgin)
+Stare/Tikilib qaramoq
+What are you looking at/Nimaga qarayapsan?
+Look at/Qaramoq (Boqmoq)
+Eating out/Tashqarida ovqatlanmoq
+Don't bother with cooking/Ovqat tayyorlab ovora bo'lma
+Today/Bugun
+Tonight/Bugun kechqurun
+These days/Shu kunlarda
+Nowadays/Bizni vaqtimizda
+Still/Hali ham
+Tomorrow/Ertaga
+This weekend/Shu dam olishda (kunlarida)
+Follow/Orqasidan quvlamoq (Kuzatmoq yoki ergashmoq)
+Hardly ever/Kamdan-kam (ravish)
