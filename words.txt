@@ -394,3 +394,130 @@ Tomorrow/Ertaga
 This weekend/Shu dam olishda (kunlarida)
 Follow/Orqasidan quvlamoq (Kuzatmoq yoki ergashmoq)
 Hardly ever/Kamdan-kam (ravish)
+Prepositions of place/JOY PREDLOGLARI
+at the door/ eshik oldida
+at the crossroads/ chorrahada
+at the traffic light/ svetofor oldida
+at the top of the stairs/ zinaning tepasida
+at the bottom of the page/ sahifaning pastki qismida
+at the end of the street/ ko'chaning oxirida
+at a party/ ziyofatda
+at a concert/ konsertda
+at the cinema/ kinoteatrda
+at school/ maktabda
+at university/ universitetda
+at home/ uyda
+at work/ ishda
+at the bakery/ novvoyxonada
+at a café / kafeda
+at the chemist's / dorixonada
+in the bag/ sumkada (ichida)
+in the classroom/ sinfxonada (ichida)
+in a box/ qutida (ichida)
+in London/ Londonda
+in Europe/ Yevropada
+in the Alps/ Alp tog'larida
+in the world/ dunyoda
+in the car/ mashinada (ichida)
+in a van/ furgonda (ichida)
+in the sea/ dengizda
+in a river/ daryoda
+in a lake/ ko'lda
+in the swimming pool/ suzish havzasida
+in a book/ kitobda
+in a picture/ rasmda
+in the newspaper/ gazetada
+on the table/ stol ustida
+on the carpet/ gilam ustida
+on the roof/ tom ustida
+on the sofa/ divan ustida
+on the first floor/ birinchi qavatda
+on the fifth floor/ beshinchi qavatda
+on the right/ o'ng tomonda
+on the left/ chap tomonda
+on the bus/ avtobusda
+on the train/ poezdda
+on a plane/ samolyotda
+on the radio/ radioda
+on TV/ televizorda
+on the Internet/ internetda
+on a website/ veb-saytda
+Prepositions of time/VAQT PREDLOGLARI
+at 6 o'clock/ soat 6 da
+at 10:30 pm/ kechqurun soat 10:30 da
+at Christmas/ Rojdestvo bayramida
+at New Year/ Yangi yilda
+at Easter/ Pasxa bayramida
+at noon/ tushda (soat 12 da)
+at night/ kechasi
+at sunrise/ quyosh chiqishida
+at sunset/ quyosh botishida
+at dawn/ tongda
+at dusk/ g'ira-shirada
+at midnight/ yarim tunda
+at midday/ kun o'rtasida (tushda)
+at bedtime/ uxlash vaqtida
+at dinnertime/ kechki ovqat vaqtida
+at lunchtime/ tushlik vaqtida
+at breakfast/ nonushta vaqtida
+at the moment/ hozirgi paytda
+at that time/ o'sha vaqtda
+at the same time/ bir vaqtning o'zida
+at present/ hozirda
+at the weekend/ dam olish kunlarida (Britanancha aksent)
+in 2018/ 2018-yilda
+in August/ avgustda
+in December/ dekabrda
+in the summer/ yozda
+in the winter/ qishda
+in the morning/ ertalab
+in the afternoon/ tushdan keyin
+in the evening/ kechqurun
+in the past/ o'tmishda
+in the future/ kelajakda
+in the 80s/ 80-yillarda
+in the ice age/ muzlik davrida
+in ten minutes/ o'n daqiqadan keyin
+in an hour/ bir soatdan keyin
+in a decade/ o'n yil ichida
+in this century/ shu asrda
+in the 21st century/ 21-asrda
+in the seventies/ yetmishinchi yillarda
+in the 1970's/ 1970-yillarda
+in the Dark Ages/ Qorong'u asrlarda
+in the Eastern holiday/ Sharq bayramida
+on Sunday/ yakshanba kuni
+on May 6th/ 6-may kuni
+on Mondays/ har dushanba kuni
+on my birthday/ tug'ilgan kunimda
+on our anniversary/ yilligimizda
+on a cold day/ sovuq kunda
+on a sunny day/ quyoshli kunda
+on holiday/ ta'tilda
+on time/ o'z vaqtida
+on that day/ o'sha kuni
+on Friday evening/ juma oqshomi
+on Tuesday night/ seshanba kechasi
+on the first day/ birinchi kuni
+on the last day/ oxirgi kuni
+on Christmas Day/ Rojdestvo kuni
+on Halloween/ Xellouin kuni
+on New Year's Eve/ Yangi yil arafasida
+on the 4th of July/ 4-iyul kuni
+on the 10th/ 10-chi sanada
+on April 15 2004/ 2004-yil 15-aprelda
+on weekdays/ ish kunlari
+on the weekend/ dam olish kunlarida (Amerikancha aksent)
+Boarding pass/Chiqish taloni
+Checked baggage/Ro'yxatdan o'tgan bagaj
+Carry on/Qo'l yuki
+Hand luggage/Qo'l yuki
+Terminal/Terminal
+Gate/Darvoza
+Layover/Qo'nish
+Stopover/To'xtash
+Delayed/Kechiktirilgan
+Boarding time/Chiqish vatqi
+Excess baggage fee/Ortiqcha bagaj uchun to'lov
+Customs/Bojxona
+Water/Sug'orish
