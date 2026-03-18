@@ -521,3 +521,48 @@ Boarding time/Chiqish vatqi
 Excess baggage fee/Ortiqcha bagaj uchun to'lov
 Customs/Bojxona
 Water/Sug'orish
+Belt/Belbog' (kamar)
+Blouse/Ko'fta (Ko'ylak)
+Boots/Etiklar
+Cap/Beysbolka (Kepka)
+Coat/Palto
+Dress/Ko'ylak
+Gloves/Qo'lqoplar
+Hat/Bosh kiyim
+Hoodie/Qalpoqli kiyim
+Jacket/Kurtka
+Jacket/Pidjak
+Jeans/Jinsi shim
+Overalls/Kombinzon
+Pyjamas/Pijama
+Knickers/Trusik (ayol)
+Underpants/Trusik (erkak)
+Trousers/Shim
+Raincoat/Plash
+Scarf/Sharf
+Shirt/Ko'ylak (erkak)
+Shoes/Oyoq kıyımlar
+Shorts/Shortik
+Skirt/Yubka
+Socks/Paypoq
+Suit/Kastyum-shim
+Jumper/Jemfer (Sviter)
+Polo/Yoqali futbolka
+Sportwears/Sport kiyimi
+Swimming trunks/Cho'milish uchun sho'rtik
+Swimsuit/Kupalnik (ayol)
+Tie/Galstuk
+T-shirt/Futbolka
+Glasses/Ko'zoynak
+Watch/Qo'l soat
+Jewelry/Zargarlik buyumlari
+Diamond/Olmos
+Shopaholic/Molparast (harid vasvasasi)
+Therapy/Terapiya (stressni yechish)
+Hand me/Qo'l mehnati (Qo'lda qilingan yoki yasalgan)
+Lawyer/Advokat
+Comfortable/Qulay (komfortno)
+Easy to wear/Kiyishga qulay yoki soon
+Practical/Kirchimol
+I don't care about/Menga farqi yo'q
+It depends on/Vaziyatga qarab(когда как)
