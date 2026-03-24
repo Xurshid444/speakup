@@ -288,23 +288,80 @@ function ivRenderGroups(){
 function ivRenderFullList(){
   const container=$('irv-full-list'); if(!container) return;
   container.innerHTML='';
+
+  // Sarlavha
   const hdr=document.createElement('div');
   hdr.style.cssText='font-size:18px;font-weight:800;color:var(--text);margin:28px 0 14px;';
   hdr.textContent="📋 To'liq ro'yxat (243 ta fe'l)";
   container.appendChild(hdr);
-  const tbl=document.createElement('div');
-  tbl.style.cssText='width:100%;border-radius:14px;overflow:hidden;border:1px solid var(--border);';
-  const th=document.createElement('div');
-  th.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--s3);padding:9px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;';
-  th.innerHTML='<div>V1 (Base)</div><div>V2 (Past)</div><div>V3 (Participle)</div>';
-  tbl.appendChild(th);
-  IVERBS_DATA.forEach((v,i)=>{
-    const row=document.createElement('div');
-    row.style.cssText=`display:grid;grid-template-columns:1fr 1fr 1fr;padding:8px 12px;font-size:13px;border-top:1px solid var(--border);background:${i%2===0?'var(--s1)':'var(--s2)'};`;
-    row.innerHTML=`<div style="font-weight:700;color:var(--text);">${v[0]}</div><div style="color:var(--accent);">${v[1]}</div><div style="color:var(--purple-light);">${v[2]}</div>`;
-    tbl.appendChild(row);
-  });
-  container.appendChild(tbl);
+
+  // Search input
+  const searchWrap=document.createElement('div');
+  searchWrap.style.cssText='position:relative;margin-bottom:16px;';
+  searchWrap.innerHTML=`<svg style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input id="irv-search" type="text" placeholder="Fe'l qidirish..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:10px 14px 10px 38px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;" />`;
+  container.appendChild(searchWrap);
+  searchWrap.querySelector('#irv-search').addEventListener('focus',e=>e.target.style.borderColor='var(--accent)');
+  searchWrap.querySelector('#irv-search').addEventListener('blur',e=>e.target.style.borderColor='var(--border)');
+
+  // Jadval konteyneri
+  const listWrap=document.createElement('div');
+  listWrap.id='irv-list-wrap';
+  container.appendChild(listWrap);
+
+  function renderList(filter){
+    listWrap.innerHTML='';
+    const q=(filter||'').toLowerCase().trim();
+    const filtered=q ? IVERBS_DATA.filter(v=>v[0].includes(q)||v[1].toLowerCase().includes(q)||v[2].toLowerCase().includes(q)) : null;
+    const data=filtered||IVERBS_DATA;
+
+    if(!data.length){
+      const empty=document.createElement('div');
+      empty.style.cssText='text-align:center;color:var(--text3);padding:24px;font-size:14px;';
+      empty.textContent="Hech narsa topilmadi";
+      listWrap.appendChild(empty);
+      return;
+    }
+
+    if(q){
+      // Qidiruv natijasi — harfsiz
+      const tbl=ivMakeTable(data,false);
+      listWrap.appendChild(tbl);
+    } else {
+      // Harflar bo'yicha guruhlash
+      const groups={};
+      IVERBS_DATA.forEach(v=>{
+        const letter=v[0][0].toUpperCase();
+        if(!groups[letter]) groups[letter]=[];
+        groups[letter].push(v);
+      });
+      Object.keys(groups).sort().forEach(letter=>{
+        const letHdr=document.createElement('div');
+        letHdr.style.cssText='display:flex;align-items:center;gap:10px;margin:20px 0 8px;';
+        letHdr.innerHTML=`<div style="width:32px;height:32px;border-radius:10px;background:var(--pdim);border:1px solid rgba(108,60,225,.3);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:var(--purple-light);">${letter}</div><div style="flex:1;height:1px;background:var(--border);"></div>`;
+        listWrap.appendChild(letHdr);
+        listWrap.appendChild(ivMakeTable(groups[letter],false));
+      });
+    }
+  }
+
+  function ivMakeTable(data, showHeader){
+    const wrap=document.createElement('div');
+    wrap.style.cssText='width:100%;border-radius:12px;overflow:hidden;border:1px solid var(--border);';
+    const th=document.createElement('div');
+    th.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--s3);padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;';
+    th.innerHTML='<div>Infinitive</div><div>V2</div><div>V3</div>';
+    wrap.appendChild(th);
+    data.forEach((v,i)=>{
+      const row=document.createElement('div');
+      row.style.cssText=`display:grid;grid-template-columns:1fr 1fr 1fr;padding:8px 12px;font-size:13px;border-top:1px solid var(--border);background:${i%2===0?'var(--s1)':'var(--s2)'};`;
+      row.innerHTML=`<div style="font-weight:700;color:var(--text);">${v[0]}</div><div style="color:var(--accent);">${v[1]}</div><div style="color:var(--purple-light);">${v[2]}</div>`;
+      wrap.appendChild(row);
+    });
+    return wrap;
+  }
+
+  renderList('');
+  searchWrap.querySelector('#irv-search').addEventListener('input',e=>renderList(e.target.value));
 }
 
 function ivShowModes(gi){
