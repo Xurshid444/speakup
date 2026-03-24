@@ -261,7 +261,7 @@ const IV_GROUPS = [
 // compute start/end indices
 (()=>{ let s=0; IV_GROUPS.forEach(g=>{ g.start=s; g.end=s+g.count; s+=g.count; }); })();
 
-const IV = { mode:'voice', groupIdx:0, words:[], idx:0, score:0, wrong:[] };
+const IV = { mode:'voice', groupIdx:0, words:[], idx:0, score:0, wrong:[], voiceStep:'v2', _v2ok:true };
 
 // take first slash-variant, lowercase
 function ivNorm(s){ return s.split('/')[0].toLowerCase().trim(); }
@@ -281,6 +281,30 @@ function ivRenderGroups(){
     c.addEventListener('click',()=>ivShowModes(i));
     grid.appendChild(c);
   });
+  ivRenderFullList();
+}
+
+// ── TO'LIQ RO'YXAT ──
+function ivRenderFullList(){
+  const container=$('irv-full-list'); if(!container) return;
+  container.innerHTML='';
+  const hdr=document.createElement('div');
+  hdr.style.cssText='font-size:18px;font-weight:800;color:var(--text);margin:28px 0 14px;';
+  hdr.textContent="📋 To'liq ro'yxat (243 ta fe'l)";
+  container.appendChild(hdr);
+  const tbl=document.createElement('div');
+  tbl.style.cssText='width:100%;border-radius:14px;overflow:hidden;border:1px solid var(--border);';
+  const th=document.createElement('div');
+  th.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--s3);padding:9px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;';
+  th.innerHTML='<div>V1 (Base)</div><div>V2 (Past)</div><div>V3 (Participle)</div>';
+  tbl.appendChild(th);
+  IVERBS_DATA.forEach((v,i)=>{
+    const row=document.createElement('div');
+    row.style.cssText=`display:grid;grid-template-columns:1fr 1fr 1fr;padding:8px 12px;font-size:13px;border-top:1px solid var(--border);background:${i%2===0?'var(--s1)':'var(--s2)'};`;
+    row.innerHTML=`<div style="font-weight:700;color:var(--text);">${v[0]}</div><div style="color:var(--accent);">${v[1]}</div><div style="color:var(--purple-light);">${v[2]}</div>`;
+    tbl.appendChild(row);
+  });
+  container.appendChild(tbl);
 }
 
 function ivShowModes(gi){
@@ -334,6 +358,8 @@ function ivRenderVoiceCard(){
   $('iv-v2-hint').textContent='?';
   $('iv-v3-hint').textContent='?';
   $('iv-v-fb').style.display='none';
+  IV.voiceStep='v2';
+  $('iv-vtbox').textContent='V2 (Past Tense) ni aytib yuboring...';
   speak(w.v1);
 }
 
@@ -346,27 +372,43 @@ function ivInitMic(){
     play:'iv-vplay', tbox:'iv-vtbox', wave:'iv-vwave',
     onSend:async(text)=>{
       const w=IV.words[IV.idx];
-      const v2ok=ivMatch(text,w.v2);
-      const v3ok=ivMatch(text,w.v3);
-      const ok=v2ok&&v3ok;
-      $('iv-v2-hint').textContent=w.v2;
-      $('iv-v3-hint').textContent=w.v3;
       const fb=$('iv-v-fb');
-      if(ok){
-        IV.score++;
-        fb.className='sp-feedback correct';
-        fb.innerHTML=`✅ To'g'ri! <b>${w.v1}</b> → <b>${w.v2}</b> → <b>${w.v3}</b>`;
+      if(IV.voiceStep==='v2'){
+        const v2ok=ivMatch(text,w.v2);
+        IV._v2ok=v2ok;
+        $('iv-v2-hint').textContent=w.v2;
+        if(v2ok){
+          fb.className='sp-feedback correct';
+          fb.innerHTML=`✅ V2 to'g'ri! <b>${w.v2}</b> — endi V3 ni aytib yuboring`;
+        } else {
+          fb.className='sp-feedback wrong';
+          fb.innerHTML=`❌ V2 xato. To'g'risi: <b>${w.v2}</b> — endi V3 ni aytib yuboring`;
+          speak(ivNorm(w.v2));
+        }
+        fb.style.display='block';
+        IV.voiceStep='v3';
+        $('iv-vtbox').textContent='V3 (Past Participle) ni aytib yuboring...';
       } else {
-        IV.wrong.push(w);
-        fb.className='sp-feedback wrong';
-        let msg='❌ ';
-        if(!v2ok) msg+=`V2: <b>${w.v2}</b> `;
-        if(!v3ok) msg+=`V3: <b>${w.v3}</b>`;
-        fb.innerHTML=msg;
-        speak(`${ivNorm(w.v2)}, ${ivNorm(w.v3)}`);
+        const v3ok=ivMatch(text,w.v3);
+        const v2ok=IV._v2ok;
+        const ok=v2ok&&v3ok;
+        $('iv-v3-hint').textContent=w.v3;
+        if(ok){
+          IV.score++;
+          fb.className='sp-feedback correct';
+          fb.innerHTML=`✅ To'g'ri! <b>${w.v1}</b> → <b>${w.v2}</b> → <b>${w.v3}</b>`;
+        } else {
+          IV.wrong.push(w);
+          fb.className='sp-feedback wrong';
+          let msg='❌ ';
+          if(!v2ok) msg+=`V2: <b>${w.v2}</b>  `;
+          if(!v3ok) msg+=`V3: <b>${w.v3}</b>`;
+          fb.innerHTML=msg;
+          if(!v3ok) speak(ivNorm(w.v3));
+        }
+        fb.style.display='block';
+        setTimeout(()=>{ IV.idx++; ivRenderVoiceCard(); }, 2200);
       }
-      fb.style.display='block';
-      setTimeout(()=>{ IV.idx++; ivRenderVoiceCard(); }, 2200);
     }
   });
 }
@@ -479,7 +521,7 @@ function ivCheckSpell(){
     speak(`${ivNorm(w.v2)}, ${ivNorm(w.v3)}`);
   }
   fb.style.display='block';
-  inp2.disabled=true; inp3.disabled=true;
+  $('iv-sp-inp2').disabled=true; $('iv-sp-inp3').disabled=true;
   setTimeout(()=>{ IV.idx++; ivRenderSpellCard(); }, 2200);
 }
 
@@ -492,7 +534,17 @@ document.getElementById('iv-sp-inp3').addEventListener('focus',()=>{ _ivActiveFi
 document.getElementById('iv-sp-check').addEventListener('click', ivCheckSpell);
 document.getElementById('iv-sp-hint').addEventListener('click',()=>{
   const w=IV.words[IV.idx]; if(!w) return;
-  toast(`💡 V2: ${ivNorm(w.v2)} · V3: ${ivNorm(w.v3)}`);
+  const field=_ivActiveField;
+  const answer=field==='v2'?w.v2:w.v3;
+  const inp=field==='v2'?$('iv-sp-inp2'):$('iv-sp-inp3');
+  const pfx=field==='v2'?'iv2b':'iv3b';
+  const norm=ivNorm(answer);
+  const curLen=inp.value.replace(/ /g,'').length;
+  if(curLen<norm.replace(/ /g,'').length){
+    inp.value=norm.slice(0,curLen+1);
+    ivUpdateBoxes(inp.value,answer,pfx);
+    inp.focus();
+  }
 });
 document.getElementById('iv-sp-skip').addEventListener('click',()=>{
   if(IV.idx<IV.words.length) IV.wrong.push(IV.words[IV.idx]);
