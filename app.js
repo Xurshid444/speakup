@@ -57,6 +57,8 @@ $('start-btn').addEventListener('click',()=>{
   updateTtsIndicator();
   renderGroqUsage();
   if(S.elKey){ loadElInfo(); setTimeout(loadElVoices,600); }
+  ivRenderGroups();
+  ivInitMic();
 });
 
 $('logout-btn').addEventListener('click',()=>{ if(confirm('Chiqasizmi?'))location.reload(); });
@@ -74,7 +76,7 @@ function switchTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   const tBtn=document.querySelector(`.tab[data-tab="${name}"]`);
   if(tBtn) tBtn.classList.add('on');
-  ['home','book','vocab','spelling','mcq','filltype','wordorder','free','mydict','settings'].forEach(p=>{
+  ['home','book','vocab','spelling','mcq','filltype','wordorder','free','mydict','irverbs','settings'].forEach(p=>{
     const el=$(p+'-panel'); if(el) el.classList.toggle('on',p===name);
   });
   // Tab ochilganda unit gridlarni ko'rsatamiz
@@ -111,6 +113,10 @@ function switchTab(name){
     }
     const anyActiveS=['sv-lessons','sv-game','sv-score'].some(id=>{const el=$(id);return el&&el.style.display!=='none';});
     if(!anyActiveS){ const su=$('sv-units'); if(su) su.style.display='block'; }
+  }
+  if(name==='irverbs'){
+    const g=$('irv-unit-grid');
+    if(g && g.children.length===0) ivRenderGroups();
   }
   if(name==='mydict'){
     // game yopiq, home ko'rinsin
