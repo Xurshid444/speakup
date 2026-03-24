@@ -252,14 +252,23 @@ const IVERBS_DATA = [
   ['write','wrote','written'],
 ];
 
-const IV_GROUPS = [
-  { label:'A – C', emoji:'🅰️', count:43 },
-  { label:'D – H', emoji:'📗', count:44 },
-  { label:'I – R', emoji:'📘', count:70 },
-  { label:'S – Z', emoji:'📙', count:86 },
+// ── Harf bo'yicha dinamik guruhlar ──
+const IV_LETTER_GROUPS = (()=>{
+  const map={};
+  IVERBS_DATA.forEach(v=>{ const l=v[0][0].toUpperCase(); if(!map[l]) map[l]=[]; map[l].push(v); });
+  return Object.keys(map).sort().map(l=>({ letter:l, words:map[l] }));
+})();
+
+const _IV_COLORS=[
+  'linear-gradient(135deg,#6C3CE1,#A855F7)',
+  'linear-gradient(135deg,#0891B2,#06B6D4)',
+  'linear-gradient(135deg,#D97706,#F59E0B)',
+  'linear-gradient(135deg,#059669,#10B981)',
+  'linear-gradient(135deg,#DB2777,#F472B6)',
+  'linear-gradient(135deg,#7C3AED,#8B5CF6)',
+  'linear-gradient(135deg,#EA580C,#FB923C)',
+  'linear-gradient(135deg,#1D4ED8,#60A5FA)',
 ];
-// compute start/end indices
-(()=>{ let s=0; IV_GROUPS.forEach(g=>{ g.start=s; g.end=s+g.count; s+=g.count; }); })();
 
 const IV = { mode:'voice', groupIdx:0, words:[], idx:0, score:0, wrong:[], voiceStep:'v2', _v2ok:true };
 
@@ -274,10 +283,16 @@ function ivMatch(text, answer){
 
 // ── GROUPS HOME ──
 function ivRenderGroups(){
-  const grid=$('irv-unit-grid'); grid.innerHTML='';
-  IV_GROUPS.forEach((g,i)=>{
-    const c=document.createElement('div'); c.className='unit-card';
-    c.innerHTML=`<div class="unit-card-icon">${g.emoji}</div><div class="unit-card-body"><div class="un">Guruh ${i+1}</div><div class="ut">${g.label}</div><div class="uts">${g.count} ta fe'l</div></div><div class="unit-card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9,18 15,12 9,6"/></svg></div>`;
+  const grid=$('irv-unit-grid');
+  grid.innerHTML='';
+  grid.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:10px;';
+  IV_LETTER_GROUPS.forEach((g,i)=>{
+    const bg=_IV_COLORS[i%_IV_COLORS.length];
+    const c=document.createElement('div');
+    c.style.cssText=`background:${bg};border-radius:18px;padding:18px 6px 14px;text-align:center;cursor:pointer;transition:transform .18s,box-shadow .18s;user-select:none;`;
+    c.innerHTML=`<div style="font-size:30px;font-weight:900;color:#fff;line-height:1;letter-spacing:-1px;">${g.letter}</div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.75);margin-top:7px;line-height:1.3;">${g.words.length}<br>ta fe'l</div>`;
+    c.addEventListener('mouseenter',()=>{ c.style.transform='translateY(-3px)'; c.style.boxShadow='0 10px 28px rgba(0,0,0,0.35)'; });
+    c.addEventListener('mouseleave',()=>{ c.style.transform=''; c.style.boxShadow=''; });
     c.addEventListener('click',()=>ivShowModes(i));
     grid.appendChild(c);
   });
@@ -366,10 +381,11 @@ function ivRenderFullList(){
 
 function ivShowModes(gi){
   IV.groupIdx=gi;
-  const g=IV_GROUPS[gi];
+  const g=IV_LETTER_GROUPS[gi];
+  const bg=_IV_COLORS[gi%_IV_COLORS.length];
   $('irv-home').style.display='none';
   $('irv-modes').style.display='block';
-  $('irv-group-name').textContent=`${g.emoji} Guruh ${gi+1}: ${g.label} — ${g.count} ta fe'l`;
+  $('irv-group-name').innerHTML=`<span style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:12px;background:${bg};font-size:20px;font-weight:900;color:#fff;margin-right:10px;vertical-align:middle;">${g.letter}</span>${g.letter} harfi — ${g.words.length} ta fe'l`;
 }
 
 document.getElementById('irv-back-home').addEventListener('click',()=>{
@@ -383,8 +399,8 @@ document.getElementById('irv-spell-btn').addEventListener('click',()=>ivStart('s
 // ── START GAME ──
 function ivStart(mode){
   IV.mode=mode;
-  const g=IV_GROUPS[IV.groupIdx];
-  IV.words=IVERBS_DATA.slice(g.start,g.end).map(w=>({v1:w[0],v2:w[1],v3:w[2]}));
+  const g=IV_LETTER_GROUPS[IV.groupIdx];
+  IV.words=g.words.map(w=>({v1:w[0],v2:w[1],v3:w[2]}));
   // shuffle
   for(let i=IV.words.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
