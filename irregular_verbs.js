@@ -387,6 +387,58 @@ document.getElementById('irv-voice-back').addEventListener('click',()=>{
 });
 
 // ── SPELL MODE ──
+let _ivActiveField='v2';
+
+function ivFocusField(field){
+  _ivActiveField=field;
+  $(field==='v2'?'iv-sp-inp2':'iv-sp-inp3').focus();
+}
+
+function ivRenderLetterBoxes(containerId, answer, pfx){
+  const norm=ivNorm(answer);
+  const c=$(containerId); c.innerHTML='';
+  norm.split('').forEach((ch,i)=>{
+    const b=document.createElement('div');
+    if(ch===' '){ b.className='sp-box space'; }
+    else { b.className='sp-box'+(i===0?' active sp-cursor':''); b.id=`${pfx}-${i}`; }
+    c.appendChild(b);
+  });
+}
+
+function ivUpdateBoxes(val, answer, pfx){
+  const norm=ivNorm(answer);
+  const inputNoSp=val.toLowerCase().replace(/ /g,'');
+  document.querySelectorAll(`[id^="${pfx}-"]`).forEach(b=>b.classList.remove('sp-cursor','active'));
+  // move cursor to next empty box
+  let cc=0;
+  for(let bi=0;bi<norm.length;bi++){
+    if(norm[bi]===' ')continue;
+    if(cc===inputNoSp.length){ const b=document.getElementById(`${pfx}-${bi}`); if(b){b.classList.add('active','sp-cursor');} break; }
+    cc++;
+  }
+  // fill letters
+  let li=0;
+  for(let i=0;i<norm.length;i++){
+    if(norm[i]===' ')continue;
+    const b=document.getElementById(`${pfx}-${i}`); if(!b){li++;continue;}
+    const ch=inputNoSp[li]||'';
+    b.textContent=ch;
+    b.className=(ch==='')?((li===inputNoSp.length)?'sp-box active sp-cursor':'sp-box'):'sp-box';
+    li++;
+  }
+}
+
+function ivColorBoxes(containerId, typed, answer, isCorrect){
+  const norm=ivNorm(answer);
+  const t=typed.toLowerCase().replace(/ /g,'');
+  const boxes=[...$(containerId).querySelectorAll('.sp-box:not(.space)')];
+  if(isCorrect){
+    boxes.forEach((b,i)=>{ b.textContent=t[i]||norm[i]||''; b.className='sp-box correct'; });
+  } else {
+    boxes.forEach((b,i)=>{ b.textContent=norm[i]||''; b.className='sp-box wrong'; });
+  }
+}
+
 function ivRenderSpellCard(){
   if(IV.idx>=IV.words.length){ ivShowScore(); return; }
   const w=IV.words[IV.idx];
@@ -394,25 +446,27 @@ function ivRenderSpellCard(){
   $('iv-sp-score').textContent=`✅ ${IV.score}`;
   $('iv-sp-fill').style.width=(IV.idx/IV.words.length*100)+'%';
   $('iv-sp-v1').textContent=w.v1;
-  const v2=$('iv-sp-v2'), v3=$('iv-sp-v3');
-  v2.value=''; v3.value='';
-  v2.className='iv-inp'; v3.className='iv-inp';
-  v2.disabled=false; v3.disabled=false;
+  ivRenderLetterBoxes('iv-v2-letters', w.v2, 'iv2b');
+  ivRenderLetterBoxes('iv-v3-letters', w.v3, 'iv3b');
+  const inp2=$('iv-sp-inp2'), inp3=$('iv-sp-inp3');
+  inp2.value=''; inp3.value='';
+  inp2.disabled=false; inp3.disabled=false;
   $('iv-sp-fb').style.display='none';
+  _ivActiveField='v2';
   speak(w.v1);
-  setTimeout(()=>v2.focus(),100);
+  setTimeout(()=>{ inp2.focus(); $('iv-v2-row').style.opacity='1'; $('iv-v3-row').style.opacity='0.55'; }, 120);
 }
 
 function ivCheckSpell(){
   const w=IV.words[IV.idx];
-  const v2val=$('iv-sp-v2').value.trim();
-  const v3val=$('iv-sp-v3').value.trim();
-  if(!v2val||!v3val){ toast("Ikkala maydonni ham to'ldiring!"); return; }
-  const v2ok=ivMatch(v2val,w.v2);
-  const v3ok=ivMatch(v3val,w.v3);
+  const v2val=$('iv-sp-inp2').value.trim();
+  const v3val=$('iv-sp-inp3').value.trim();
+  if(!v2val||!v3val){ toast("Ikkala shaklni ham to'ldiring!"); return; }
+  const v2ok=w.v2.split('/').some(a=>v2val.toLowerCase()===a.trim().toLowerCase());
+  const v3ok=w.v3.split('/').some(a=>v3val.toLowerCase()===a.trim().toLowerCase());
   const ok=v2ok&&v3ok;
-  $('iv-sp-v2').className='iv-inp'+(v2ok?' iv-correct':' iv-wrong');
-  $('iv-sp-v3').className='iv-inp'+(v3ok?' iv-correct':' iv-wrong');
+  ivColorBoxes('iv-v2-letters', v2val, w.v2, v2ok);
+  ivColorBoxes('iv-v3-letters', v3val, w.v3, v3ok);
   const fb=$('iv-sp-fb');
   if(ok){
     IV.score++;
@@ -425,13 +479,17 @@ function ivCheckSpell(){
     speak(`${ivNorm(w.v2)}, ${ivNorm(w.v3)}`);
   }
   fb.style.display='block';
-  $('iv-sp-v2').disabled=true; $('iv-sp-v3').disabled=true;
+  inp2.disabled=true; inp3.disabled=true;
   setTimeout(()=>{ IV.idx++; ivRenderSpellCard(); }, 2200);
 }
 
+document.getElementById('iv-sp-inp2').addEventListener('input',e=>{ const w=IV.words[IV.idx]; if(w) ivUpdateBoxes(e.target.value,w.v2,'iv2b'); });
+document.getElementById('iv-sp-inp3').addEventListener('input',e=>{ const w=IV.words[IV.idx]; if(w) ivUpdateBoxes(e.target.value,w.v3,'iv3b'); });
+document.getElementById('iv-sp-inp2').addEventListener('keydown',e=>{ if(e.key==='Enter'){ _ivActiveField='v3'; $('iv-sp-inp3').focus(); $('iv-v2-row').style.opacity='0.55'; $('iv-v3-row').style.opacity='1'; } });
+document.getElementById('iv-sp-inp3').addEventListener('keydown',e=>{ if(e.key==='Enter') ivCheckSpell(); });
+document.getElementById('iv-sp-inp2').addEventListener('focus',()=>{ _ivActiveField='v2'; $('iv-v2-row').style.opacity='1'; $('iv-v3-row').style.opacity='0.55'; });
+document.getElementById('iv-sp-inp3').addEventListener('focus',()=>{ _ivActiveField='v3'; $('iv-v2-row').style.opacity='0.55'; $('iv-v3-row').style.opacity='1'; });
 document.getElementById('iv-sp-check').addEventListener('click', ivCheckSpell);
-document.getElementById('iv-sp-v2').addEventListener('keydown',e=>{ if(e.key==='Enter') $('iv-sp-v3').focus(); });
-document.getElementById('iv-sp-v3').addEventListener('keydown',e=>{ if(e.key==='Enter') ivCheckSpell(); });
 document.getElementById('iv-sp-hint').addEventListener('click',()=>{
   const w=IV.words[IV.idx]; if(!w) return;
   toast(`💡 V2: ${ivNorm(w.v2)} · V3: ${ivNorm(w.v3)}`);

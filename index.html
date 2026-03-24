@@ -541,17 +541,20 @@
           <div style="font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;">Base form (V1)</div>
           <div id="iv-sp-v1" style="font-size:36px;font-weight:900;color:var(--text);letter-spacing:1px;"></div>
         </div>
-        <!-- Inputs -->
-        <div style="display:flex;flex-direction:column;gap:14px;width:100%;max-width:500px;">
-          <div>
-            <label style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:6px;">Past Tense (V2)</label>
-            <input class="iv-inp" id="iv-sp-v2" placeholder="V2 shaklini yozing..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text"/>
+        <!-- Letter boxes -->
+        <div style="display:flex;flex-direction:column;gap:20px;width:100%;max-width:500px;">
+          <div id="iv-v2-row" onclick="ivFocusField('v2')" style="cursor:text;transition:opacity .2s;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;">Past Tense (V2)</div>
+            <div class="sp-letters" id="iv-v2-letters"></div>
           </div>
-          <div>
-            <label style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:6px;">Past Participle (V3)</label>
-            <input class="iv-inp" id="iv-sp-v3" placeholder="V3 shaklini yozing..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" type="text"/>
+          <div id="iv-v3-row" onclick="ivFocusField('v3')" style="cursor:text;opacity:0.55;transition:opacity .2s;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--purple-light);text-transform:uppercase;margin-bottom:8px;">Past Participle (V3)</div>
+            <div class="sp-letters" id="iv-v3-letters"></div>
           </div>
         </div>
+        <!-- Hidden inputs (like sp-input) -->
+        <input class="sp-input" id="iv-sp-inp2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" type="text" dir="ltr"/>
+        <input class="sp-input" id="iv-sp-inp3" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" type="text" dir="ltr"/>
         <div class="sp-feedback" id="iv-sp-fb" style="display:none;width:100%;max-width:500px;"></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
           <button class="btn btn-g" id="iv-sp-check" style="width:auto;">✓ Tekshirish</button>
