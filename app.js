@@ -191,7 +191,8 @@ document.querySelectorAll('#settings-panel .seg').forEach(seg=>{
     if(seg.id==='acc-app')  S.accent=btn.dataset.v;
   }));
 });
-$('spd-app').addEventListener('input',e=>{ S.speed=parseFloat(e.target.value); $('spd-disp').textContent=S.speed.toFixed(1)+'x'; });
+$('spd-app').addEventListener('input',e=>{ S.speed=parseFloat(e.target.value); $('spd-disp').textContent=S.speed.toFixed(1)+'x'; localStorage.setItem('speakup_speed',S.speed); });
+(()=>{ const sv=parseFloat(localStorage.getItem('speakup_speed')); if(sv&&!isNaN(sv)){ S.speed=sv; $('spd-app').value=sv; $('spd-disp').textContent=sv.toFixed(1)+'x'; } })();
 const volApp=document.getElementById('vol-app');
 if(volApp){
   volApp.addEventListener('input',e=>{
