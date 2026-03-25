@@ -363,29 +363,36 @@ function ivRenderFullList(){
     const wrap=document.createElement('div');
     wrap.style.cssText='width:100%;border-radius:12px;overflow:hidden;border:1px solid var(--border);';
     const th=document.createElement('div');
-    th.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr 32px;background:var(--s3);padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;align-items:center;';
-    th.innerHTML='<div>Infinitive</div><div>V2</div><div>V3</div><div></div>';
+    th.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--s3);padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;';
+    th.innerHTML='<div>Infinitive</div><div>V2</div><div>V3</div>';
     wrap.appendChild(th);
-    const speakerSVG=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/><path d="M19.07,4.93a10,10,0,0,1,0,14.14"/></svg>`;
-    data.forEach((v,i)=>{
-      const row=document.createElement('div');
-      row.style.cssText=`display:grid;grid-template-columns:1fr 1fr 1fr 32px;padding:7px 12px;font-size:13px;border-top:1px solid var(--border);background:${i%2===0?'var(--s1)':'var(--s2)'};align-items:center;`;
+    const spkSVG=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg>`;
+    function makeCell(word, color){
+      const cell=document.createElement('div');
+      cell.style.cssText='display:flex;align-items:center;gap:5px;';
+      const txt=document.createElement('span');
+      txt.style.cssText=`font-size:13px;color:${color};${color==='var(--text)'?'font-weight:700;':''}`;
+      txt.textContent=word;
       const btn=document.createElement('button');
-      btn.style.cssText='background:none;border:none;padding:4px;cursor:pointer;color:var(--text3);border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .15s,background .15s;';
-      btn.innerHTML=speakerSVG;
-      btn.title='Tinglash';
-      btn.addEventListener('mouseenter',()=>{ btn.style.color='var(--accent)'; btn.style.background='var(--adim)'; });
-      btn.addEventListener('mouseleave',()=>{ btn.style.color='var(--text3)'; btn.style.background='none'; });
+      btn.style.cssText='background:none;border:none;padding:2px 3px;cursor:pointer;color:var(--text3);border-radius:5px;display:flex;align-items:center;flex-shrink:0;transition:color .15s;';
+      btn.innerHTML=spkSVG;
+      btn.addEventListener('mouseenter',()=>btn.style.color=color);
+      btn.addEventListener('mouseleave',()=>btn.style.color='var(--text3)');
       btn.addEventListener('click',(e)=>{
         e.stopPropagation();
-        speak(`${v[0]}, ${ivNorm(v[1])}, ${ivNorm(v[2])}`);
-        btn.style.color='var(--accent)';
-        setTimeout(()=>{ btn.style.color='var(--text3)'; },1200);
+        speak(ivNorm(word));
+        btn.style.color=color;
+        setTimeout(()=>btn.style.color='var(--text3)',1000);
       });
-      const v1=document.createElement('div'); v1.style.cssText='font-weight:700;color:var(--text);'; v1.textContent=v[0];
-      const v2=document.createElement('div'); v2.style.cssText='color:var(--accent);'; v2.textContent=v[1];
-      const v3=document.createElement('div'); v3.style.cssText='color:var(--purple-light);'; v3.textContent=v[2];
-      row.appendChild(v1); row.appendChild(v2); row.appendChild(v3); row.appendChild(btn);
+      cell.appendChild(txt); cell.appendChild(btn);
+      return cell;
+    }
+    data.forEach((v,i)=>{
+      const row=document.createElement('div');
+      row.style.cssText=`display:grid;grid-template-columns:1fr 1fr 1fr;padding:7px 12px;border-top:1px solid var(--border);background:${i%2===0?'var(--s1)':'var(--s2)'};align-items:center;`;
+      row.appendChild(makeCell(v[0],'var(--text)'));
+      row.appendChild(makeCell(v[1],'var(--accent)'));
+      row.appendChild(makeCell(v[2],'var(--purple-light)'));
       wrap.appendChild(row);
     });
     return wrap;
