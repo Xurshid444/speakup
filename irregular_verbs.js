@@ -472,38 +472,60 @@ function ivRenderFullList(){
       cell.appendChild(txt); cell.appendChild(btn);
       return cell;
     }
+    // V1 o'zbek tarjimasidan V2/V3 hosil qilish
+    function uzDerive(tr){
+      // "/" bo'lsa birinchisini ol, "()" ni olib tashla
+      const base=tr.split('/')[0].replace(/\(.*?\)/g,'').trim();
+      const words=base.split(' ');
+      const last=words[words.length-1];
+      if(!last.endsWith('moq')) return null;
+      const stem=last.slice(0,-3);
+      const prefix=words.slice(0,-1).join(' ');
+      const v2=(prefix?prefix+' ':'')+stem+'di';
+      const v3=(prefix?prefix+' ':'')+stem+'gan';
+      return {v2,v3};
+    }
+
     let activeTooltip=null;
     data.forEach((v,i)=>{
       const row=document.createElement('div');
       const bgColor=i%2===0?'var(--s1)':'var(--s2)';
-      row.style.cssText=`display:grid;grid-template-columns:1fr 1fr 1fr;padding:11px 12px;border-top:1px solid var(--border);background:${bgColor};align-items:center;cursor:pointer;transition:background .15s;`;
-      row.appendChild(makeCell(v[0],'var(--text)'));
-      row.appendChild(makeCell(v[1],'var(--accent)'));
-      row.appendChild(makeCell(v[2],'var(--purple-light)'));
 
       const tr=IV_TRANSLATIONS[ivNorm(v[0])];
+      const derived=tr?uzDerive(tr):null;
+
+      const rowWrap=document.createElement('div');
+      rowWrap.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;padding:11px 12px;align-items:center;';
+      rowWrap.appendChild(makeCell(v[0],'var(--text)'));
+      rowWrap.appendChild(makeCell(v[1],'var(--accent)'));
+      rowWrap.appendChild(makeCell(v[2],'var(--purple-light)'));
+
+      row.style.cssText=`border-top:1px solid var(--border);background:${bgColor};${tr?'cursor:pointer;':''}`;
+      row.appendChild(rowWrap);
+
       if(tr){
         const tooltip=document.createElement('div');
-        tooltip.style.cssText='display:none;grid-column:1/-1;padding:7px 12px 9px;background:var(--pdim);border-top:1px solid var(--border);font-size:13px;color:var(--accent2,#a78bfa);font-style:italic;letter-spacing:.01em;';
-        tooltip.textContent='📖 '+tr;
-        row.style.gridTemplateColumns='1fr 1fr 1fr';
-        // make row a grid container to allow tooltip row
-        const rowWrap=document.createElement('div');
-        rowWrap.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;';
-        // move children to rowWrap
-        while(row.firstChild) rowWrap.appendChild(row.firstChild);
-        row.style.cssText=`border-top:1px solid var(--border);background:${bgColor};cursor:pointer;transition:background .15s;`;
-        row.appendChild(rowWrap);
+        tooltip.style.cssText='display:none;border-top:1px dashed var(--border);background:var(--pdim);padding:6px 12px 8px;';
+        const v1tr=tr.split('/')[0].trim();
+        const v2tr=derived?derived.v2:'—';
+        const v3tr=derived?derived.v3:'—';
+        tooltip.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:2px;">Infinitive</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:2px;">V2 (o'tgan)</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:2px;">V3 (sifatdosh)</div>
+          <div style="font-size:13px;color:var(--text);font-style:italic;">${v1tr}</div>
+          <div style="font-size:13px;color:var(--accent);font-style:italic;">${v2tr}</div>
+          <div style="font-size:13px;color:var(--purple-light,#a78bfa);font-style:italic;">${v3tr}</div>
+        </div>`;
         row.appendChild(tooltip);
 
         row.addEventListener('click',(e)=>{
           if(e.target.closest('button')) return;
           const isOpen=tooltip.style.display!=='none';
-          if(activeTooltip && activeTooltip!==tooltip){ activeTooltip.style.display='none'; }
+          if(activeTooltip && activeTooltip!==tooltip) activeTooltip.style.display='none';
           tooltip.style.display=isOpen?'none':'block';
           activeTooltip=isOpen?null:tooltip;
         });
-        rowWrap.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;padding:11px 12px;align-items:center;';
       }
       wrap.appendChild(row);
     });
