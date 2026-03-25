@@ -182,11 +182,19 @@ async function speak(text,cb){
 function browserSpeak(text,cb){
   window.speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);
-  u.lang=S.accent;u.rate=S.speed;
-  u.volume = S.volume !== undefined ? S.volume : 1.0;
-  if(S.pickedVoice)u.voice=S.pickedVoice;
+  u.lang=S.accent;
+  u.rate=S.speed||1.0;
+  u.volume=S.volume!==undefined?S.volume:1.0;
+  const voices=window.speechSynthesis.getVoices();
+  let voice=null;
+  if(S.pickedVoice) voice=voices.find(v=>v.name===S.pickedVoice.name)||null;
+  if(!voice) voice=voices.find(v=>v.lang===u.lang)||voices.find(v=>v.lang.startsWith('en'))||null;
+  if(voice) u.voice=voice;
   u.onend=()=>{setSt('Tayyor');if(cb)cb();};
-  window.speechSynthesis.speak(u);setSt('🔊 Gapirmoqda...');
+  u.onerror=()=>{setSt('Tayyor');if(cb)cb();};
+  // Chrome bug: cancel() + speak() ba'zan ishlamaydi — kichik delay kerak
+  setTimeout(()=>{ window.speechSynthesis.speak(u); },50);
+  setSt('🔊 Gapirmoqda...');
 }
 function getQ(text){const lines=text.split('\n').filter(l=>l.trim());for(let i=lines.length-1;i>=0;i--)if(lines[i].includes('?'))return lines[i];return lines[lines.length-1]||text;}
 

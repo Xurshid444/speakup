@@ -252,6 +252,91 @@ const IVERBS_DATA = [
   ['write','wrote','written'],
 ];
 
+// ── Tarjimalar (O'zbek) ──
+const IV_TRANSLATIONS = {
+  'abide':'chidamoq / yashash','arise':'paydo bo\'lmoq','awake':'uyg\'onmoq',
+  'backbite':'orqadan gapirmoq','backslide':'orqaga qaytmoq','be':'bo\'lmoq',
+  'bear':'ko\'tarmoq / tug\'moq','beat':'urmoq','become':'bo\'lmoq / aylanmoq',
+  'befall':'yuz bermoq','beget':'tug\'moq','begin':'boshlash',
+  'behold':'qaramoq','bend':'bukmoq','bereave':'mahrum qilmoq',
+  'beseech':'yalvormoq','beset':'o\'rab olmoq','bet':'garov o\'ynamoq',
+  'bid':'taklif qilmoq','bind':'bog\'lamoq','bite':'tishlamoq',
+  'bleed':'qon ketmoq','blow':'puflash','break':'sindirmoq',
+  'breed':'yetishtirmoq','bring':'olib kelmoq','broadcast':'efirga uzatmoq',
+  'build':'qurmoq','burn':'yonmoq / yoqmoq','burst':'portlamoq',
+  'buy':'sotib olmoq','cast':'tashlash','catch':'tutmoq',
+  'chide':'ta\'na qilmoq','choose':'tanlash','cleave':'yormoq',
+  'cling':'yopishmoq','clothe':'kiyintirmoq','come':'kelmoq',
+  'cost':'turmoq (narx)','creep':'emaklamoq','crow':'qichqirmoq (xo\'roz)',
+  'cut':'kesmoq','deal':'muomala qilmoq','dig':'qazish',
+  'dive':'sho\'ng\'imoq','do':'qilmoq','draw':'chizmoq / tortmoq',
+  'dream':'tush ko\'rmoq / orzu qilmoq','drink':'ichmoq','drive':'haydash',
+  'dwell':'yashash','eat':'yemoq','engrave':'o\'ymakorlik qilmoq',
+  'fall':'yiqilmoq / tushmoq','feed':'ovqatlantirmoq','feel':'his qilmoq',
+  'fight':'janglamoq','find':'topmoq','flee':'qochmoq',
+  'fling':'otmoq','fly':'uchmoq','forbear':'chidamoq',
+  'forbid':'taqiqlash','forecast':'bashorat qilmoq','foresee':'oldindan ko\'rmoq',
+  'foretell':'bashorat qilmoq','forget':'unutmoq','forgive':'kechirmoq',
+  'forsake':'tark etmoq','freeze':'muzlatmoq','get':'olmoq',
+  'gild':'zarlab olmoq','give':'bermoq','go':'bormoq',
+  'grind':'maydalash','grip':'ushlamoq','grow':'o\'sish',
+  'hang':'osmoq','have':'ega bo\'lmoq','hear':'eshitmoq',
+  'heave':'ko\'tarmoq','hew':'chopmoq','hide':'yashirmoq',
+  'hit':'urmoq','hold':'ushlamoq','hurt':'og\'riq bermoq',
+  'inlay':'ichiga joylashtirmoq','input':'kiritmoq','interweave':'o\'rmoq',
+  'keep':'saqlash','kneel':'tiz cho\'kmoq','knit':'to\'qimoq',
+  'know':'bilmoq','lay':'yotqizmoq','lead':'boshqarmoq',
+  'lean':'tayanmoq','leap':'sakramoq','learn':'o\'rganmoq',
+  'leave':'ketmoq / qoldirmoq','lend':'qarz bermoq','let':'ruxsat bermoq',
+  'lie':'yotmoq','light':'yoqmoq','lose':'yo\'qotmoq',
+  'make':'yasash / qilmoq','mean':'anglatmoq','meet':'uchrashmoq',
+  'melt':'eritmoq','mislead':'chalg\'itmoq','mistake':'xato qilmoq',
+  'misunderstand':'noto\'g\'ri tushunmoq','mow':'o\'t o\'rmoq','offset':'muvozanatlash',
+  'outbid':'ko\'proq taklif bermoq','outdo':'ortiq qilmoq','outgrow':'o\'sib ketmoq',
+  'output':'chiqarmoq','outrun':'qochib ketmoq','overcome':'yengmoq',
+  'overdo':'haddan oshirmoq','overflow':'toshmoq','overhang':'osilib turmoq',
+  'overhear':'eshitib qolmoq','overlay':'ustiga qo\'ymoq','override':'bekor qilmoq',
+  'oversee':'nazorat qilmoq','overshoot':'o\'tib ketmoq','oversleep':'uxlab qolmoq',
+  'overtake':'ortib o\'tmoq','overthrow':'ag\'darmoq','partake':'ishtirok etmoq',
+  'pay':'to\'lash','plead':'yalvormoq','preset':'oldindan sozlamoq',
+  'prove':'isbotlamoq','put':'qo\'ymoq','quit':'tashlab ketmoq',
+  'quickset':'tez qotirmoq','quickfreeze':'tez muzlatmoq','read':'o\'qish',
+  'rebuild':'qayta qurmoq','recast':'qayta quymoq','redo':'qayta qilmoq',
+  'rehear':'qayta eshitmoq','remake':'qayta yasash','rend':'yirtmoq',
+  'repay':'qaytarib bermoq','reset':'qayta sozlamoq','retake':'qayta olmoq',
+  'retell':'qayta hikoya qilmoq','rewrite':'qayta yozmoq','rid':'xalos qilmoq',
+  'ride':'minmoq','ring':'jiringlamoq','rise':'ko\'tarilmoq',
+  'run':'yugurmoq','saw':'arra bilan kesmoq','say':'aytmoq',
+  'see':'ko\'rmoq','seek':'izlamoq','sell':'sotmoq',
+  'send':'yubormoq','set':'qo\'ymoq / sozlamoq','sew':'tikmoq',
+  'shake':'silkitmoq','shave':'soqol olmoq','shear':'qirqmoq',
+  'shed':'to\'kmoq','shine':'yiltirash / porlash','shoot':'otmoq',
+  'show':'ko\'rsatmoq','shrink':'kichraymoq','shut':'yopmoq',
+  'sing':'qo\'shiq aytmoq','sink':'cho\'kmoq','sit':'o\'tirmoq',
+  'slay':'o\'ldirmoq','sleep':'uxlamoq','slide':'siljish',
+  'sling':'otmoq','slink':'yashirincha ketmoq','slit':'yormoq',
+  'smell':'hidlamoq','smite':'kuchli urmoq','sow':'ekmoq',
+  'speak':'gapirmoq','speed':'tezlashtirmoq','spell':'harflab yozmoq',
+  'spend':'sarflamoq','spill':'to\'kmoq','spin':'aylanmoq',
+  'spit':'tupurmoq','split':'bo\'linmoq / yormoq','spoil':'buzmoq / aynish',
+  'spread':'tarqatmoq','spring':'sakramoq','stand':'turmoq',
+  'steal':'o\'g\'irlamoq','stick':'yopishmoq','sting':'chaqmoq',
+  'stink':'sasish','strew':'sochmoq','stride':'qadam tashlash',
+  'strike':'urmoq','string':'ipga tortmoq','strive':'intilmoq',
+  'swear':'qasam ichmoq','sweep':'supurmoq','swell':'shishmoq',
+  'swim':'suzmoq','swing':'tebranmoq','take':'olmoq',
+  'teach':'o\'qitmoq','tear':'yirtmoq','tell':'aytmoq / gapirib bermoq',
+  'think':'o\'ylash','thrive':'rivojlanmoq','throw':'tashlash',
+  'thrust':'itarmoq','tread':'bosmoq','understand':'tushunmoq',
+  'undertake':'zimmasiga olmoq','underwrite':'kafillik qilmoq','undo':'bekor qilmoq',
+  'unfreeze':'eritmoq','unwind':'bo\'shashtirmoq','uphold':'qo\'llab-quvvatlamoq',
+  'upset':'xafa qilmoq','wake':'uyg\'otmoq','waylay':'yo\'l to\'smoq',
+  'wear':'kiymoq','weave':'to\'qimoq','wed':'uylanmoq',
+  'weep':'yig\'lamoq','wet':'ho\'llamoq','win':'yutmoq',
+  'wind':'o\'ramoq','withdraw':'tortib olmoq','withhold':'ushlab qolmoq',
+  'withstand':'bardosh bermoq','wring':'siqmoq','write':'yozmoq',
+};
+
 // ── Harf bo'yicha dinamik guruhlar ──
 const IV_LETTER_GROUPS = (()=>{
   const map={};
@@ -387,12 +472,39 @@ function ivRenderFullList(){
       cell.appendChild(txt); cell.appendChild(btn);
       return cell;
     }
+    let activeTooltip=null;
     data.forEach((v,i)=>{
       const row=document.createElement('div');
-      row.style.cssText=`display:grid;grid-template-columns:1fr 1fr 1fr;padding:11px 12px;border-top:1px solid var(--border);background:${i%2===0?'var(--s1)':'var(--s2)'};align-items:center;`;
+      const bgColor=i%2===0?'var(--s1)':'var(--s2)';
+      row.style.cssText=`display:grid;grid-template-columns:1fr 1fr 1fr;padding:11px 12px;border-top:1px solid var(--border);background:${bgColor};align-items:center;cursor:pointer;transition:background .15s;`;
       row.appendChild(makeCell(v[0],'var(--text)'));
       row.appendChild(makeCell(v[1],'var(--accent)'));
       row.appendChild(makeCell(v[2],'var(--purple-light)'));
+
+      const tr=IV_TRANSLATIONS[ivNorm(v[0])];
+      if(tr){
+        const tooltip=document.createElement('div');
+        tooltip.style.cssText='display:none;grid-column:1/-1;padding:7px 12px 9px;background:var(--pdim);border-top:1px solid var(--border);font-size:13px;color:var(--accent2,#a78bfa);font-style:italic;letter-spacing:.01em;';
+        tooltip.textContent='📖 '+tr;
+        row.style.gridTemplateColumns='1fr 1fr 1fr';
+        // make row a grid container to allow tooltip row
+        const rowWrap=document.createElement('div');
+        rowWrap.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;';
+        // move children to rowWrap
+        while(row.firstChild) rowWrap.appendChild(row.firstChild);
+        row.style.cssText=`border-top:1px solid var(--border);background:${bgColor};cursor:pointer;transition:background .15s;`;
+        row.appendChild(rowWrap);
+        row.appendChild(tooltip);
+
+        row.addEventListener('click',(e)=>{
+          if(e.target.closest('button')) return;
+          const isOpen=tooltip.style.display!=='none';
+          if(activeTooltip && activeTooltip!==tooltip){ activeTooltip.style.display='none'; }
+          tooltip.style.display=isOpen?'none':'block';
+          activeTooltip=isOpen?null:tooltip;
+        });
+        rowWrap.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;padding:11px 12px;align-items:center;';
+      }
       wrap.appendChild(row);
     });
     return wrap;
