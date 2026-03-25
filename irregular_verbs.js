@@ -366,15 +366,15 @@ function ivRenderFullList(){
     th.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--s3);padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;';
     th.innerHTML='<div>Infinitive</div><div>V2</div><div>V3</div>';
     wrap.appendChild(th);
-    const spkSVG=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg>`;
+    const spkSVG=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54,8.46a5,5,0,0,1,0,7.07"/></svg>`;
     function makeCell(word, color){
       const cell=document.createElement('div');
-      cell.style.cssText='display:flex;align-items:center;gap:5px;';
+      cell.style.cssText='display:flex;align-items:center;gap:7px;';
       const txt=document.createElement('span');
-      txt.style.cssText=`font-size:13px;color:${color};${color==='var(--text)'?'font-weight:700;':''}`;
+      txt.style.cssText=`font-size:16px;color:${color};${color==='var(--text)'?'font-weight:700;':''}`;
       txt.textContent=word;
       const btn=document.createElement('button');
-      btn.style.cssText='background:none;border:none;padding:2px 3px;cursor:pointer;color:var(--text3);border-radius:5px;display:flex;align-items:center;flex-shrink:0;transition:color .15s;';
+      btn.style.cssText='background:none;border:none;padding:3px 4px;cursor:pointer;color:var(--text3);border-radius:6px;display:flex;align-items:center;flex-shrink:0;transition:color .15s;';
       btn.innerHTML=spkSVG;
       btn.addEventListener('mouseenter',()=>btn.style.color=color);
       btn.addEventListener('mouseleave',()=>btn.style.color='var(--text3)');
@@ -389,7 +389,7 @@ function ivRenderFullList(){
     }
     data.forEach((v,i)=>{
       const row=document.createElement('div');
-      row.style.cssText=`display:grid;grid-template-columns:1fr 1fr 1fr;padding:7px 12px;border-top:1px solid var(--border);background:${i%2===0?'var(--s1)':'var(--s2)'};align-items:center;`;
+      row.style.cssText=`display:grid;grid-template-columns:1fr 1fr 1fr;padding:11px 12px;border-top:1px solid var(--border);background:${i%2===0?'var(--s1)':'var(--s2)'};align-items:center;`;
       row.appendChild(makeCell(v[0],'var(--text)'));
       row.appendChild(makeCell(v[1],'var(--accent)'));
       row.appendChild(makeCell(v[2],'var(--purple-light)'));
