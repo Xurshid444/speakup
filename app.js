@@ -59,6 +59,7 @@ $('start-btn').addEventListener('click',()=>{
   if(S.elKey){ loadElInfo(); setTimeout(loadElVoices,600); }
   ivRenderGroups();
   ivInitMic();
+  ordInit();
 });
 
 $('logout-btn').addEventListener('click',()=>{ if(confirm('Chiqasizmi?'))location.reload(); });
@@ -76,7 +77,7 @@ function switchTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   const tBtn=document.querySelector(`.tab[data-tab="${name}"]`);
   if(tBtn) tBtn.classList.add('on');
-  ['home','book','vocab','spelling','mcq','filltype','wordorder','free','mydict','irverbs','settings'].forEach(p=>{
+  ['home','book','vocab','spelling','mcq','filltype','wordorder','free','mydict','irverbs','ordinals','settings'].forEach(p=>{
     const el=$(p+'-panel'); if(el) el.classList.toggle('on',p===name);
   });
   // Tab ochilganda unit gridlarni ko'rsatamiz
