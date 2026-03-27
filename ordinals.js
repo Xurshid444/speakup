@@ -51,10 +51,10 @@ const ORDINALS_DATA = [
 ];
 
 const ORD = { mode: 'spell', idx: 0, score: 0, wrong: [], words: [] };
+let _ordMicDone = false;
 
 function ordInit() {
   ordRenderList();
-
   $('ord-voice-btn').addEventListener('click', () => ordStart('voice'));
   $('ord-spell-btn').addEventListener('click', () => ordStart('spell'));
   $('ord-back-home').addEventListener('click', ordGoHome);
@@ -64,6 +64,36 @@ function ordInit() {
   $('ord-ans-input').addEventListener('keydown', e => { if (e.key === 'Enter') ordCheck(); });
   $('ord-check-btn').addEventListener('click', ordCheck);
   $('ord-play-btn').addEventListener('click', () => speak(ORDINALS_DATA[ORD.words[ORD.idx]][1]));
+  ordInitMic();
+}
+
+// ── Speech recognition mic ──
+function ordInitMic() {
+  if (_ordMicDone) return; _ordMicDone = true;
+  makeMic({
+    idle: 'ord-vi', recst: 'ord-vr', rev: 'ord-vvr',
+    rec: 'ord-vrec', stop: 'ord-vstop', del: 'ord-vdel',
+    snd: 'ord-vsnd', play: 'ord-vplay',
+    tbox: null, wave: 'ord-wave',
+    onSend: (text) => {
+      const item = ORDINALS_DATA[ORD.words[ORD.idx]];
+      const correct = item[1].toLowerCase().replace(/-/g, ' ').trim();
+      const spoken = text.toLowerCase().replace(/-/g, ' ').trim();
+      const fb = $('ord-v-feedback');
+      $('ord-next-btn').style.display = '';
+
+      if (spoken === correct || spoken.includes(correct) || correct.includes(spoken)) {
+        ORD.score++;
+        fb.textContent = '✓ To\'g\'ri! ' + item[1];
+        fb.style.color = 'var(--green,#10b981)';
+      } else {
+        ORD.wrong.push(ORD.words[ORD.idx]);
+        fb.textContent = '✗ To\'g\'risi: ' + item[1];
+        fb.style.color = 'var(--red,#ef4444)';
+        speak(item[1]);
+      }
+    }
+  });
 }
 
 // ── Full list ──
@@ -76,24 +106,24 @@ function ordRenderList() {
   tbl.style.cssText = 'border:1px solid var(--border);border-radius:12px;overflow:hidden;';
 
   const hdr = document.createElement('div');
-  hdr.style.cssText = 'display:grid;grid-template-columns:100px 1fr 36px;background:var(--s3);padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;';
+  hdr.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 36px;background:var(--s3);padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text2);text-transform:uppercase;';
   hdr.innerHTML = '<div>Raqam</div><div>So\'z</div><div></div>';
   tbl.appendChild(hdr);
 
   ORDINALS_DATA.forEach((item, i) => {
     const row = document.createElement('div');
-    row.style.cssText = `display:grid;grid-template-columns:100px 1fr 36px;padding:10px 14px;border-top:1px solid var(--border);background:${i % 2 === 0 ? 'var(--s1)' : 'var(--s2)'};align-items:center;`;
+    row.style.cssText = `display:grid;grid-template-columns:1fr 1fr 36px;padding:10px 14px;border-top:1px solid var(--border);background:${i % 2 === 0 ? 'var(--s1)' : 'var(--s2)'};align-items:center;gap:4px;`;
 
     const numEl = document.createElement('span');
-    numEl.style.cssText = 'font-size:17px;font-weight:700;color:var(--text);';
+    numEl.style.cssText = 'font-size:15px;font-weight:700;color:var(--text);word-break:break-all;';
     numEl.textContent = item[0];
 
     const wordEl = document.createElement('span');
-    wordEl.style.cssText = 'font-size:16px;color:var(--accent);';
+    wordEl.style.cssText = 'font-size:14px;color:var(--accent);word-break:break-word;';
     wordEl.textContent = item[1];
 
     const btn = document.createElement('button');
-    btn.style.cssText = 'background:none;border:none;padding:4px;cursor:pointer;color:var(--text3);border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .15s;';
+    btn.style.cssText = 'background:none;border:none;padding:4px;cursor:pointer;color:var(--text3);border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .15s;flex-shrink:0;';
     btn.innerHTML = spkSVG;
     btn.addEventListener('mouseenter', () => btn.style.color = 'var(--accent)');
     btn.addEventListener('mouseleave', () => btn.style.color = 'var(--text3)');
@@ -116,7 +146,6 @@ function ordRenderList() {
 function ordStart(mode) {
   ORD.mode = mode;
   ORD.words = ORDINALS_DATA.map((_, i) => i);
-  // shuffle
   for (let i = ORD.words.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [ORD.words[i], ORD.words[j]] = [ORD.words[j], ORD.words[i]];
@@ -138,36 +167,38 @@ function ordGoHome() {
 function ordRenderCard() {
   const item = ORDINALS_DATA[ORD.words[ORD.idx]];
   const total = ORD.words.length;
-  const prog = Math.round((ORD.idx / total) * 100);
-
-  $('ord-progress-bar').style.width = prog + '%';
+  $('ord-progress-bar').style.width = Math.round((ORD.idx / total) * 100) + '%';
   $('ord-progress-txt').textContent = `${ORD.idx + 1} / ${total}`;
-  $('ord-feedback').textContent = '';
-  $('ord-feedback').style.color = '';
   $('ord-next-btn').style.display = 'none';
-  $('ord-ans-input').value = '';
-  $('ord-ans-input').disabled = false;
-  $('ord-ans-input').style.borderColor = '';
-  $('ord-check-btn').style.display = '';
-  $('ord-play-btn').style.display = ORD.mode === 'voice' ? '' : 'none';
+  $('ord-card-main').textContent = item[0];
 
   if (ORD.mode === 'voice') {
-    // Show number, hear → type the written word
-    $('ord-card-label').textContent = 'Eshiting va yozing:';
-    $('ord-card-main').textContent = item[0];
-    $('ord-ans-input').placeholder = 'Masalan: twenty-first';
+    $('ord-card-label').textContent = 'Eshiting va gapirib bering:';
+    $('ord-play-btn').style.display = '';
+    $('ord-voice-section').style.display = 'block';
+    $('ord-spell-section').style.display = 'none';
+    $('ord-v-feedback').textContent = '';
+    // Reset mic to idle
+    $('ord-vi').style.display = '';
+    $('ord-vr').style.display = 'none';
+    $('ord-vvr').style.display = 'none';
     setTimeout(() => speak(item[1]), 300);
   } else {
-    // Show number, type the written word (no audio auto-play)
     $('ord-card-label').textContent = 'Qanday o\'qiladi? Yozing:';
-    $('ord-card-main').textContent = item[0];
-    $('ord-ans-input').placeholder = 'Masalan: twenty-first';
+    $('ord-play-btn').style.display = 'none';
+    $('ord-voice-section').style.display = 'none';
+    $('ord-spell-section').style.display = 'block';
+    $('ord-feedback').textContent = '';
+    $('ord-feedback').style.color = '';
+    $('ord-ans-input').value = '';
+    $('ord-ans-input').disabled = false;
+    $('ord-ans-input').style.borderColor = '';
+    $('ord-check-btn').style.display = '';
+    setTimeout(() => $('ord-ans-input').focus(), 100);
   }
-
-  setTimeout(() => $('ord-ans-input').focus(), 100);
 }
 
-// ── Check answer ──
+// ── Check answer (spell mode) ──
 function ordCheck() {
   const item = ORDINALS_DATA[ORD.words[ORD.idx]];
   const correct = item[1].toLowerCase().trim();
@@ -185,7 +216,7 @@ function ordCheck() {
     $('ord-ans-input').style.borderColor = 'var(--green,#10b981)';
   } else {
     ORD.wrong.push(ORD.words[ORD.idx]);
-    $('ord-feedback').textContent = `✗  To'g'risi: ${item[1]}`;
+    $('ord-feedback').textContent = '✗  To\'g\'risi: ' + item[1];
     $('ord-feedback').style.color = 'var(--red,#ef4444)';
     $('ord-ans-input').style.borderColor = 'var(--red,#ef4444)';
     speak(item[1]);
@@ -217,8 +248,8 @@ function ordShowScore() {
     ORD.wrong.forEach(wi => {
       const item = ORDINALS_DATA[wi];
       const d = document.createElement('div');
-      d.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--s2);border-radius:8px;margin-bottom:6px;';
-      d.innerHTML = `<span style="font-weight:700;color:var(--text)">${item[0]}</span><span style="color:var(--accent)">${item[1]}</span>`;
+      d.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--s2);border-radius:8px;margin-bottom:6px;gap:8px;';
+      d.innerHTML = `<span style="font-weight:700;color:var(--text);word-break:break-all;">${item[0]}</span><span style="color:var(--accent);text-align:right;">${item[1]}</span>`;
       wr.appendChild(d);
     });
   }
