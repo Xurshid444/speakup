@@ -179,10 +179,13 @@ async function speak(text,cb){
   }
   browserSpeak(text,cb);
 }
+let _currentUtterance=null; // GC dan saqlash uchun global ref
 function browserSpeak(text,cb){
+  if(!window.speechSynthesis){if(cb)cb();return;}
   window.speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);
-  u.lang=S.accent;
+  _currentUtterance=u; // Chrome GC bug fix
+  u.lang=S.accent||'en-US';
   u.rate=S.speed||1.0;
   u.volume=S.volume!==undefined?S.volume:1.0;
   const voices=window.speechSynthesis.getVoices();
@@ -190,10 +193,14 @@ function browserSpeak(text,cb){
   if(S.pickedVoice) voice=voices.find(v=>v.name===S.pickedVoice.name)||null;
   if(!voice) voice=voices.find(v=>v.lang===u.lang)||voices.find(v=>v.lang.startsWith('en'))||null;
   if(voice) u.voice=voice;
-  u.onend=()=>{setSt('Tayyor');if(cb)cb();};
-  u.onerror=()=>{setSt('Tayyor');if(cb)cb();};
-  // Chrome bug: cancel() + speak() ba'zan ishlamaydi — kichik delay kerak
-  setTimeout(()=>{ window.speechSynthesis.speak(u); },50);
+  u.onend=()=>{setSt('Tayyor');_currentUtterance=null;if(cb)cb();};
+  u.onerror=(e)=>{setSt('Tayyor');_currentUtterance=null;if(cb)cb();};
+  // Chrome: paused holatida bo'lishi mumkin — resume qilamiz
+  if(window.speechSynthesis.paused) window.speechSynthesis.resume();
+  setTimeout(()=>{
+    if(window.speechSynthesis.paused) window.speechSynthesis.resume();
+    window.speechSynthesis.speak(u);
+  },50);
   setSt('🔊 Gapirmoqda...');
 }
 function getQ(text){const lines=text.split('\n').filter(l=>l.trim());for(let i=lines.length-1;i>=0;i--)if(lines[i].includes('?'))return lines[i];return lines[lines.length-1]||text;}
