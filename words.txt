@@ -566,3 +566,73 @@ Easy to wear/Kiyishga qulay yoki soon
 Practical/Kirchimol
 I don't care about/Menga farqi yo'q
 It depends on/Vaziyatga qarab(когда как)
+Colorful/Rang-barang
+Good quality/Yuqori sifat
+Basic/Asosiy
+Late/Kech
+Floor/Qavat
+Feature/Xususiyat
+Useful/Foydali
+Arm/Qo'l
+Adult/Katta odam
+Unusual/Noodatiy
+Exciting/Zavqli
+Wind/Shamol
+Magazine/Jurnal
+Leather/Charm
+Announcement/E'lon
+Opening times/Ish vat
+Leg/Oyoq
+Hand/Kaft (qo'l)
+Yesterday/Kecha
+Last/O'tgan (Kesha)
+Last night/Kecha tunda
+Last week/O'tgan hafta
+Last month/O'tgan oy
+Last year/O'tgan yili
+Last Monday/O'tgan Dushanba
+Ago/Avval (oldin)
+Two days ago/Ikki kun oldin
+A week ago/Bir hafta oldin
+Five minutes ago/Besh daqiqa oldin
+Long ago/Ancha oldin
+In/O'tgan yıl (sana)
+In 2010/2010-yilda
+In the 19th century/19-asrda
+The day before yesterday/Kechagi kun (bir kun oldin)
+When I was/...ligimda
+When I was a child/Bolaligimda
+When I was young/Navqironligimda
+It depend's on occasion/Marosimga qarab
+Nineteen oh five/1905
+Nineteen hundred/1900
+Life was difficult/Uning hayoti qiyin edi
+Home less/Uysiz odam
+Same/Bir xil
+Traffic jam/Tirbandlik
+Cause/Sababi
+That's way/Shu sababli
+Get injuries/Jarohat olganlar
+Big crowd/Ko'p odam (Talpa)
+Bridge/Ko'prik
+Promote the products/Mahsulotni targ'ib qilish
+Delicious/Mazali (totli)
+Tasty/Mazali (totli)
+Health problems/Sog'liqdagi muammolar
+Issues/Sog'liqdagi muammolar
+High temperature/Tanadagi yuqori harorat
+Fever/Tanadagi yuqori harorat
+Hay fever/Allergiya
+Headache/Bosh og'rig'i
+Stoma-ache/Qorin og'rig'i
+Runny nose/Burun oqishi
+Blocked nose/Burun bitishi
+Clogged/Burun bitishi
+Cough/Yo'tal
+Sore throat/Tomoq yallig'lanishi
+I caught a cold/Men shamolladim
+I feel unwell/O'zimni yomon his qilyapman
+I have a flu/Men grippman
+Ache/Og'riq
+Pain/Og'riq
+Pain killer/Og'riq qoldiruvchi
